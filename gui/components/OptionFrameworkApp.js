@@ -11,11 +11,13 @@ import {
     Collapse,
 } from '@mui/material';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
+import axios from 'axios';
 
 const OptionFrameworkApp = ({ optionsData, instanceName }) => {
     const [formData, setFormData] = useState({});
     const [openSections, setOpenSections] = useState({});
     const [currentPage, setCurrentPage] = useState('general_settings'); // Mặc định là page đầu tiên
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const savedData = JSON.parse(localStorage.getItem(instanceName)) || {};
@@ -26,10 +28,23 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
         setFormData(prevData => ({ ...prevData, [fieldId]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        localStorage.setItem(instanceName, JSON.stringify(formData));
-        // Có thể gửi dữ liệu đến server nếu cần
+        if (!formData) {
+            setError('Dữ liệu biểu mẫu không được xác định');
+            return;
+        }
+        try {
+            // Chuyển đổi formData thành URL query parameters
+            const params = new URLSearchParams();
+            params.append('action', 'save_options');
+            params.append('data', JSON.stringify(formData)); // Gửi dữ liệu dưới dạng JSON
+
+            await axios.post('/wp-admin/admin-ajax.php', params);
+            alert('Cài đặt đã được lưu thành công!');
+        } catch (err) {
+            setError('Lỗi khi lưu cài đặt');
+        }
     };
 
     const renderField = (fieldId, field) => {
