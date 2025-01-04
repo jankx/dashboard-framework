@@ -21,6 +21,7 @@ class OptionFramework
 
         // Hook cho hành động AJAX
         add_action('wp_ajax_save_options', [$this, 'saveOptions']);
+        add_action('wp_ajax_fetch_options', [$this, 'fetchOptions']);
     }
 
     public function addSection($section_id, $section_title)
@@ -67,7 +68,7 @@ class OptionFramework
     public function enqueueScripts()
     {
         // /Users/puleeno/Projects/xanhvina.com/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/src/OptionFramework.php
-        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.1', ['wp-element'], null, true);
+        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.2', ['wp-element'], null, true);
     }
 
     public function saveOptions()
@@ -77,6 +78,7 @@ class OptionFramework
 
         // Lấy dữ liệu từ yêu cầu
         $data = json_decode(file_get_contents('php://input'), true);
+        $data = json_decode($data['data'], true);
 
         // Kiểm tra xem dữ liệu có hợp lệ không
         if (is_array($data)) {
@@ -86,5 +88,13 @@ class OptionFramework
         } else {
             wp_send_json_error('Dữ liệu không hợp lệ'); // Gửi phản hồi lỗi
         }
+    }
+
+    public function fetchOptions()
+    {
+        // Lấy dữ liệu từ wp_options
+        $options = get_option($this->instance_name);
+        // Trả về dữ liệu dưới dạng JSON
+        wp_send_json_success(json_decode($options));
     }
 }

@@ -18,11 +18,30 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
     const [openSections, setOpenSections] = useState({});
     const [currentPage, setCurrentPage] = useState('general_settings'); // Mặc định là page đầu tiên
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const savedData = JSON.parse(localStorage.getItem(instanceName)) || {};
-        setFormData(savedData);
-    }, [instanceName]);
+        const fetchOptions = async () => {
+            try {
+                const response = await axios.get('/wp-admin/admin-ajax.php', {
+                    params: {
+                        action: 'fetch_options', // Gọi action để lấy dữ liệu
+                    },
+                });
+                if (response.data.success) {
+                    setFormData(response.data.data || {}); // Cập nhật formData với dữ liệu đã lấy
+                } else {
+                    setError('Không thể lấy dữ liệu cài đặt');
+                }
+            } catch (err) {
+                setError('Lỗi khi lấy dữ liệu cài đặt');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOptions();
+    }, []);
 
     const handleChange = (fieldId, value) => {
         setFormData(prevData => ({ ...prevData, [fieldId]: value }));
@@ -35,12 +54,15 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
             return;
         }
         try {
-            // Chuyển đổi formData thành URL query parameters
-            const params = new URLSearchParams();
-            params.append('action', 'save_options');
-            params.append('data', JSON.stringify(formData)); // Gửi dữ liệu dưới dạng JSON
 
-            await axios.post('/wp-admin/admin-ajax.php', params);
+            // Gửi formData dưới dạng JSON trong phần thân của yêu cầu
+            await axios.post('/wp-admin/admin-ajax.php?action=save_options', {
+                headers: {
+                    'Content-Type': 'application/json' // Đặt tiêu đề Content-Type
+                },
+                data: JSON.stringify(formData) // Gửi formData dưới dạng JSON
+            });
+
             alert('Cài đặt đã được lưu thành công!');
         } catch (err) {
             setError('Lỗi khi lưu cài đặt');
