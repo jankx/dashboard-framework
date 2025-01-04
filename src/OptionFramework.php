@@ -2,12 +2,14 @@
 
 namespace Jankx\Dashboard;
 
-class OptionFramework {
+class OptionFramework
+{
     private $instance_name;
     private $page_title;
     private $menu_text;
 
-    public function __construct($instance_name = 'jankx_theme', $page_title = 'Tùy Chọn Theme Jankx', $menu_text = 'Tùy Chọn') {
+    public function __construct($instance_name, $page_title = 'Tùy Chọn Theme Jankx', $menu_text = 'Tùy Chọn')
+    {
         $this->instance_name = $instance_name;
         $this->page_title = $page_title;
         $this->menu_text = $menu_text;
@@ -15,11 +17,13 @@ class OptionFramework {
         add_action('admin_init', [$this, 'registerSettings']);
     }
 
-    public function addOptionsPage() {
-        add_theme_page($this->page_title, $this->menu_text, 'manage_options', "{$this->instance_name}-options", [$this, 'renderOptionsPage']);
+    public function addOptionsPage()
+    {
+        add_menu_page($this->page_title, $this->menu_text, 'manage_options', "{$this->instance_name}-options", [$this, 'renderOptionsPage']);
     }
 
-    public function renderOptionsPage() {
+    public function renderOptionsPage()
+    {
         ?>
         <div class="wrap">
             <h1><?php echo esc_html($this->page_title); ?></h1>
@@ -44,7 +48,8 @@ class OptionFramework {
         <?php
     }
 
-    public function registerSettings() {
+    public function registerSettings()
+    {
         register_setting("{$this->instance_name}_options_group", "{$this->instance_name}_logo_url");
         register_setting("{$this->instance_name}_options_group", "{$this->instance_name}_background_color");
     }
