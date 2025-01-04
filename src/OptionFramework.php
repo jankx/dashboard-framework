@@ -8,18 +8,25 @@ class OptionFramework
     private $page_title;
     private $menu_text;
 
-    public function __construct($instance_name, $page_title = 'Tùy Chọn Theme Jankx', $menu_text = 'Tùy Chọn')
+    public function __construct($instance_name = 'jankx_theme', $page_title = 'Tùy Chọn Theme Jankx', $menu_text = 'Tùy Chọn')
     {
         $this->instance_name = $instance_name;
         $this->page_title = $page_title;
         $this->menu_text = $menu_text;
+
         add_action('admin_menu', [$this, 'addOptionsPage']);
         add_action('admin_init', [$this, 'registerSettings']);
     }
 
     public function addOptionsPage()
     {
-        add_menu_page($this->page_title, $this->menu_text, 'manage_options', "{$this->instance_name}-options", [$this, 'renderOptionsPage']);
+        add_theme_page(
+            $this->page_title,
+            $this->menu_text,
+            'manage_options',
+            "{$this->instance_name}-options",
+            [$this, 'renderOptionsPage']
+        );
     }
 
     public function renderOptionsPage()
@@ -35,11 +42,15 @@ class OptionFramework
                 <table class="form-table">
                     <tr valign="top">
                         <th scope="row">URL Logo</th>
-                        <td><input type="text" name="{$this->instance_name}_logo_url" value="<?php echo esc_attr(get_option("{$this->instance_name}_logo_url")); ?>" /></td>
+                        <td>
+                            <input type="text" name="{$this->instance_name}_logo_url" value="<?php echo esc_attr(get_option("{$this->instance_name}_logo_url")); ?>" />
+                        </td>
                     </tr>
                     <tr valign="top">
                         <th scope="row">Màu Nền</th>
-                        <td><input type="text" name="{$this->instance_name}_background_color" value="<?php echo esc_attr(get_option("{$this->instance_name}_background_color")); ?>" /></td>
+                        <td>
+                            <input type="text" name="{$this->instance_name}_background_color" value="<?php echo esc_attr(get_option("{$this->instance_name}_background_color")); ?>" />
+                        </td>
                     </tr>
                 </table>
                 <?php submit_button(); ?>
