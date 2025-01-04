@@ -9,53 +9,62 @@
    const optionsData = {
        general_settings: {
            title: 'Cài Đặt Chung',
-           fields: [
-               {
-                   id: 'site_logo',
-                   title: 'Logo của Trang',
-                   type: 'input',
-                   args: {}
-               },
-               {
-                   id: 'site_description',
-                   title: 'Mô Tả Trang',
-                   type: 'textarea',
-                   args: {}
-               },
-               {
-                   id: 'color_scheme',
-                   title: 'Màu Sắc',
-                   type: 'select',
-                   args: {
-                       options: {
-                           light: 'Sáng',
-                           dark: 'Tối'
+           sections: {
+               site_info: {
+                   title: 'Thông Tin Trang',
+                   fields: [
+                       {
+                           id: 'site_logo',
+                           title: 'Logo của Trang',
+                           type: 'input',
+                           args: {}
+                       },
+                       {
+                           id: 'site_description',
+                           title: 'Mô Tả Trang',
+                           type: 'textarea',
+                           args: {}
                        }
-                   }
+                   ]
+               },
+               color_settings: {
+                   title: 'Cài Đặt Màu Sắc',
+                   fields: [
+                       {
+                           id: 'color_scheme',
+                           title: 'Màu Sắc',
+                           type: 'select',
+                           args: {
+                               options: {
+                                   light: 'Sáng',
+                                   dark: 'Tối'
+                               }
+                           }
+                       }
+                   ]
                }
-           ]
+           }
        },
        advanced_settings: {
            title: 'Cài Đặt Nâng Cao',
-           fields: [
-               {
-                   id: 'enable_feature_x',
-                   title: 'Kích Hoạt Tính Năng X',
-                   type: 'select',
-                   args: {
-                       options: {
-                           yes: 'Có',
-                           no: 'Không'
+           sections: {
+               feature_settings: {
+                   title: 'Cài Đặt Tính Năng',
+                   fields: [
+                       {
+                           id: 'enable_feature_x',
+                           title: 'Kích Hoạt Tính Năng X',
+                           type: 'select',
+                           args: {
+                               options: {
+                                   yes: 'Có',
+                                   no: 'Không'
+                               }
+                           }
                        }
-                   }
-               },
-               {
-                   id: 'custom_css',
-                   title: 'CSS Tùy Chỉnh',
-                   type: 'textarea',
-                   args: {}
+                   ]
                }
-           ]
+           }
        }
    };
 

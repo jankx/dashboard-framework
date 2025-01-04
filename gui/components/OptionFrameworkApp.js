@@ -15,6 +15,7 @@ import { ExpandLess, ExpandMore } from '@mui/icons-material';
 const OptionFrameworkApp = ({ optionsData, instanceName }) => {
     const [formData, setFormData] = useState({});
     const [openSections, setOpenSections] = useState({});
+    const [currentPage, setCurrentPage] = useState('general_settings'); // Mặc định là page đầu tiên
 
     useEffect(() => {
         const savedData = JSON.parse(localStorage.getItem(instanceName)) || {};
@@ -92,34 +93,22 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
             <Box sx={{ width: '20%', padding: 2, backgroundColor: '#f0f0f0' }}>
                 <Typography variant="h6">Navigation</Typography>
                 <List>
-                    {Object.entries(optionsData).map(([sectionId, section]) => (
-                        <div key={sectionId}>
-                            <ListItem button onClick={() => handleToggleSection(sectionId)}>
-                                <ListItemText primary={section.title} />
-                                {openSections[sectionId] ? <ExpandLess /> : <ExpandMore />}
-                            </ListItem>
-                            <Collapse in={openSections[sectionId]} timeout="auto" unmountOnExit>
-                                <List component="div" disablePadding>
-                                    {section.fields.map((field) => (
-                                        <ListItem key={field.id} sx={{ pl: 4 }}>
-                                            <ListItemText primary={field.title} />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Collapse>
-                        </div>
+                    {Object.entries(optionsData).map(([pageId, page]) => (
+                        <ListItem button key={pageId} onClick={() => setCurrentPage(pageId)}>
+                            <ListItemText primary={page.title} />
+                        </ListItem>
                     ))}
                 </List>
             </Box>
 
             {/* Nội dung chính */}
             <Box component="form" onSubmit={handleSubmit} sx={{ width: '80%', padding: 2 }}>
-                {Object.entries(optionsData).map(([sectionId, section]) => (
+                {Object.entries(optionsData[currentPage].sections).map(([sectionId, section]) => (
                     <Box key={sectionId} sx={{ marginBottom: 3 }}>
                         <Typography variant="h6">{section.title}</Typography>
-                        {Object.entries(section.fields).map(([fieldId, field]) => (
-                            <Box key={fieldId}>
-                                {renderField(fieldId, field)}
+                        {section.fields.map((field) => (
+                            <Box key={field.id}>
+                                {renderField(field.id, field)}
                             </Box>
                         ))}
                     </Box>
