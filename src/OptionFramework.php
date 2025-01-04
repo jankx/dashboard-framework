@@ -7,6 +7,7 @@ class OptionFramework
     private $instance_name;
     private $page_title;
     private $menu_text;
+    private $sections = [];
 
     public function __construct($instance_name = 'jankx_theme', $page_title = 'Tùy Chọn Theme Jankx', $menu_text = 'Tùy Chọn')
     {
@@ -15,7 +16,26 @@ class OptionFramework
         $this->menu_text = $menu_text;
 
         add_action('admin_menu', [$this, 'addOptionsPage']);
-        add_action('admin_init', [$this, 'registerSettings']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueueScripts']);
+    }
+
+    public function addSection($section_id, $section_title)
+    {
+        $this->sections[$section_id] = [
+            'title' => $section_title,
+            'fields' => []
+        ];
+    }
+
+    public function addField($section_id, $field_id, $field_title, $field_type, $args = [])
+    {
+        if (isset($this->sections[$section_id])) {
+            $this->sections[$section_id]['fields'][$field_id] = [
+                'title' => $field_title,
+                'type' => $field_type,
+                'args' => $args
+            ];
+        }
     }
 
     public function addOptionsPage()
@@ -32,36 +52,22 @@ class OptionFramework
     public function renderOptionsPage()
     {
         ?>
-        <div class="wrap">
-            <h1><?php echo esc_html($this->page_title); ?></h1>
-            <form method="post" action="options.php">
-                <?php
-                settings_fields("{$this->instance_name}_options_group");
-                do_settings_sections("{$this->instance_name}_options_group");
-                ?>
-                <table class="form-table">
-                    <tr valign="top">
-                        <th scope="row">URL Logo</th>
-                        <td>
-                            <input type="text" name="{$this->instance_name}_logo_url" value="<?php echo esc_attr(get_option("{$this->instance_name}_logo_url")); ?>" />
-                        </td>
-                    </tr>
-                    <tr valign="top">
-                        <th scope="row">Màu Nền</th>
-                        <td>
-                            <input type="text" name="{$this->instance_name}_background_color" value="<?php echo esc_attr(get_option("{$this->instance_name}_background_color")); ?>" />
-                        </td>
-                    </tr>
-                </table>
-                <?php submit_button(); ?>
-            </form>
-        </div>
+        <div id="option-framework-app"></div>
+        <script type="text/javascript">
+            const optionsData = <?php echo json_encode($this->sections); ?>;
+            const instanceName = '<?php echo esc_js($this->instance_name); ?>';
+        </script>
         <?php
     }
 
-    public function registerSettings()
+    public function enqueueScripts()
     {
-        register_setting("{$this->instance_name}_options_group", "{$this->instance_name}_logo_url");
-        register_setting("{$this->instance_name}_options_group", "{$this->instance_name}_background_color");
+        // /Users/puleeno/Projects/xanhvina.com/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/src/OptionFramework.php
+        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js', ['wp-element'], null, true);
+    }
+
+    public function saveOptions($data)
+    {
+        update_option($this->instance_name, json_encode($data));
     }
 }
