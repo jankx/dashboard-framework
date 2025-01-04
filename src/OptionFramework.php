@@ -40,7 +40,7 @@ class OptionFramework
 
     public function addOptionsPage()
     {
-        add_theme_page(
+        add_menu_page(
             $this->page_title,
             $this->menu_text,
             'manage_options',
