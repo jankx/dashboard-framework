@@ -9,18 +9,21 @@
    const optionsData = {
        general_settings: {
            title: 'Cài Đặt Chung',
-           fields: {
-               site_logo: {
+           fields: [
+               {
+                   id: 'site_logo',
                    title: 'Logo của Trang',
                    type: 'input',
                    args: {}
                },
-               site_description: {
+               {
+                   id: 'site_description',
                    title: 'Mô Tả Trang',
                    type: 'textarea',
                    args: {}
                },
-               color_scheme: {
+               {
+                   id: 'color_scheme',
                    title: 'Màu Sắc',
                    type: 'select',
                    args: {
@@ -30,7 +33,29 @@
                        }
                    }
                }
-           }
+           ]
+       },
+       advanced_settings: {
+           title: 'Cài Đặt Nâng Cao',
+           fields: [
+               {
+                   id: 'enable_feature_x',
+                   title: 'Kích Hoạt Tính Năng X',
+                   type: 'select',
+                   args: {
+                       options: {
+                           yes: 'Có',
+                           no: 'Không'
+                       }
+                   }
+               },
+               {
+                   id: 'custom_css',
+                   title: 'CSS Tùy Chỉnh',
+                   type: 'textarea',
+                   args: {}
+               }
+           ]
        }
    };
 
