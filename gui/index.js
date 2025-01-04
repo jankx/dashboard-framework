@@ -1,7 +1,10 @@
    // src/index.js
    import React from 'react';
    import ReactDOM from 'react-dom';
+   import { ThemeProvider, createTheme } from '@mui/material/styles';
    import OptionFrameworkApp from './components/OptionFrameworkApp';
+
+   const theme = createTheme(); // You can customize the theme here
 
    const optionsData = {
        general_settings: {
@@ -34,7 +37,9 @@
 // Ensure the DOM is ready before rendering
 document.addEventListener('DOMContentLoaded', () => {
     ReactDOM.render(
-        <OptionFrameworkApp optionsData={optionsData} instanceName="my_custom_theme" />,
-        document.getElementById('option-framework-app') // Ensure this ID matches
+        <ThemeProvider theme={theme}>
+            <OptionFrameworkApp optionsData={optionsData} instanceName="my_custom_theme" />
+        </ThemeProvider>,
+        document.getElementById('option-framework-app')
     );
 });

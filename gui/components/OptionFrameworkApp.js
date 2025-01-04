@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { TextField, Button, MenuItem, Typography, Box } from '@mui/material';
 
 const OptionFrameworkApp = ({ optionsData, instanceName }) => {
     const [formData, setFormData] = useState({});
 
     useEffect(() => {
-        // Load saved data from localStorage or initialize with empty object
         const savedData = JSON.parse(localStorage.getItem(instanceName)) || {};
         setFormData(savedData);
     }, [instanceName]);
@@ -15,10 +15,7 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Save data to localStorage
         localStorage.setItem(instanceName, JSON.stringify(formData));
-        // Optionally, send data to the server
-        // fetch('/path/to/save', { method: 'POST', body: JSON.stringify(formData) });
     };
 
     const renderField = (fieldId, field) => {
@@ -27,50 +24,47 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
         switch (field.type) {
             case 'input':
                 return (
-                    <input
-                        type="text"
+                    <TextField
+                        label={field.title}
                         value={value}
                         onChange={(e) => handleChange(fieldId, e.target.value)}
+                        fullWidth
+                        margin="normal"
                     />
                 );
 
             case 'textarea':
                 return (
-                    <textarea
+                    <TextField
+                        label={field.title}
                         value={value}
                         onChange={(e) => handleChange(fieldId, e.target.value)}
+                        multiline
+                        rows={4}
+                        fullWidth
+                        margin="normal"
                     />
                 );
 
             case 'select':
                 return (
-                    <select
+                    <TextField
+                        select
+                        label={field.title}
                         value={value}
                         onChange={(e) => handleChange(fieldId, e.target.value)}
+                        fullWidth
+                        margin="normal"
                     >
                         {Object.entries(field.args.options).map(([optionValue, optionLabel]) => (
-                            <option key={optionValue} value={optionValue}>
+                            <MenuItem key={optionValue} value={optionValue}>
                                 {optionLabel}
-                            </option>
+                            </MenuItem>
                         ))}
-                    </select>
+                    </TextField>
                 );
 
             // Add more field types as needed
-            // Example for a switch control
-            case 'switch':
-                return (
-                    <label>
-                        <input
-                            type="checkbox"
-                            checked={value}
-                            onChange={(e) => handleChange(fieldId, e.target.checked)}
-                        />
-                        {field.title}
-                    </label>
-                );
-
-            // Add cases for other field types like radio, multi-select, etc.
 
             default:
                 return null;
@@ -78,20 +72,21 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ padding: 2 }}>
             {Object.entries(optionsData).map(([sectionId, section]) => (
-                <div key={sectionId}>
-                    <h2>{section.title}</h2>
+                <Box key={sectionId} sx={{ marginBottom: 3 }}>
+                    <Typography variant="h6">{section.title}</Typography>
                     {Object.entries(section.fields).map(([fieldId, field]) => (
-                        <div key={fieldId}>
-                            <label>{field.title}</label>
+                        <Box key={fieldId}>
                             {renderField(fieldId, field)}
-                        </div>
+                        </Box>
                     ))}
-                </div>
+                </Box>
             ))}
-            <button type="submit">Lưu</button>
-        </form>
+            <Button type="submit" variant="contained" color="primary">
+                Lưu
+            </Button>
+        </Box>
     );
 };
 
