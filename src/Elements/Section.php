@@ -14,4 +14,4 @@ class Section {
     public function addField(Field $field) {
         $this->fields[] = $field;
     }
-} 
+}

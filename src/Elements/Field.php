@@ -14,4 +14,4 @@ class Field {
         $this->type = $type;
         $this->args = $args;
     }
-} 
+}

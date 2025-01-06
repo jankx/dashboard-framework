@@ -14,4 +14,4 @@ class Page {
     public function addSection(Section $section) {
         $this->sections[] = $section;
     }
-} 
+}
