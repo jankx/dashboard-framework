@@ -2,6 +2,10 @@
 
 namespace Jankx\Dashboard;
 
+use Jankx\Dashboard\Elements\Field;
+use Jankx\Dashboard\Elements\Section;
+use Jankx\Dashboard\Elements\Page;
+
 class OptionFramework
 {
     private $instance_name;
@@ -56,77 +60,47 @@ class OptionFramework
 
     public function renderOptionsPage()
     {
-    // Khai báo dữ liệu cho các page, section và field
+        // Khai báo các field
+        $field1 = new Field('site_logo', 'Logo của Trang', 'input');
+        $field2 = new Field('site_description', 'Mô Tả Trang', 'textarea');
+        $field3 = new Field('color_scheme', 'Màu Sắc', 'select', [
+            'options' => [
+                'light' => 'Sáng',
+                'dark' => 'Tối'
+            ]
+        ]);
+        $field4 = new Field('enable_feature_x', 'Kích Hoạt Tính Năng X', 'select', [
+            'options' => [
+                'yes' => 'Có',
+                'no' => 'Không'
+            ]
+        ]);
+
+        // Khai báo các section
+        $generalSettings = new Section('Cài Đặt Chung');
+        $generalSettings->addField($field1);
+        $generalSettings->addField($field2);
+
+        $colorSettings = new Section('Cài Đặt Màu Sắc');
+        $colorSettings->addField($field3);
+
+        $featureSettings = new Section('Cài Đặt Tính Năng');
+        $featureSettings->addField($field4);
+
+        // Khai báo các page
         $optionsData = [
-        'general_settings' => [
-            'title' => 'Cài Đặt Chung',
-            'sections' => [
-                'site_info' => [
-                    'title' => 'Thông Tin Trang',
-                    'fields' => [
-                        [
-                            'id' => 'site_logo',
-                            'title' => 'Logo của Trang',
-                            'type' => 'input',
-                            'args' => []
-                        ],
-                        [
-                            'id' => 'site_description',
-                            'title' => 'Mô Tả Trang',
-                            'type' => 'textarea',
-                            'args' => []
-                        ]
-                    ]
-                ],
-                'color_settings' => [
-                    'title' => 'Cài Đặt Màu Sắc',
-                    'fields' => [
-                        [
-                            'id' => 'color_scheme',
-                            'title' => 'Màu Sắc',
-                            'type' => 'select',
-                            'args' => [
-                                'options' => [
-                                    'light' => 'Sáng',
-                                    'dark' => 'Tối'
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ],
-        'advanced_settings' => [
-            'title' => 'Cài Đặt Nâng Cao',
-            'sections' => [
-                'feature_settings' => [
-                    'title' => 'Cài Đặt Tính Năng',
-                    'fields' => [
-                        [
-                            'id' => 'enable_feature_x',
-                            'title' => 'Kích Hoạt Tính Năng X',
-                            'type' => 'select',
-                            'args' => [
-                                'options' => [
-                                    'yes' => 'Có',
-                                    'no' => 'Không'
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
+            'general_settings' => new Page('Cài Đặt Chung', [$generalSettings, $colorSettings]),
+            'advanced_settings' => new Page('Cài Đặt Nâng Cao', [$featureSettings]),
         ];
 
-    // Truyền dữ liệu sang JavaScript
+        // Truyền dữ liệu sang JavaScript
         wp_localize_script('react-app', 'optionsData', $optionsData);
 
         ?>
-    <div id="option-framework-app"></div>
-    <script type="text/javascript">
-        const instanceName = '<?php echo esc_js($this->instance_name); ?>';
-    </script>
+        <div id="option-framework-app"></div>
+        <script type="text/javascript">
+            const instanceName = '<?php echo esc_js($this->instance_name); ?>';
+        </script>
         <?php
     }
 
