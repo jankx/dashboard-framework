@@ -2,8 +2,6 @@
 
 namespace Jankx\Dashboard;
 
-use Jankx\Dashboard\Elements\Field;
-use Jankx\Dashboard\Elements\Section;
 use Jankx\Dashboard\Elements\Page;
 
 class OptionFramework
@@ -11,71 +9,18 @@ class OptionFramework
     private $instance_name;
     private $page_title;
     private $menu_text;
-    private $pages = []; // Chứa các pages
+    public $pages = []; // Chứa các pages
 
-    public function __construct($instance_name = 'jankx_theme', $page_title = 'Tùy Chọn Theme Jankx', $menu_text = 'Tùy Chọn')
+    public function __construct($instance_name, $page_title = 'Tùy Chọn Theme Jankx', $menu_text = 'Tùy Chọn')
     {
         $this->instance_name = $instance_name;
         $this->page_title = $page_title;
         $this->menu_text = $menu_text;
 
-        // Khởi tạo các page
-        $this->pages = $this->initializePages();
-
         add_action('admin_menu', [$this, 'addOptionsPage']);
         add_action('admin_enqueue_scripts', [$this, 'enqueueScripts']);
         add_action('wp_ajax_save_options', [$this, 'saveOptions']);
         add_action('wp_ajax_fetch_options', [$this, 'fetchOptions']);
-    }
-
-    private function initializePages()
-    {
-        // Khởi tạo các page
-        $generalSettingsPage = new Page('Cài Đặt Chung', [
-            $this->initializeGeneralSettingsSection(),
-            $this->initializeColorSettingsSection()
-        ]);
-
-        $advancedSettingsPage = new Page('Cài Đặt Nâng Cao', [
-            $this->initializeFeatureSettingsSection()
-        ]);
-
-        return [
-            'general_settings' => $generalSettingsPage,
-            'advanced_settings' => $advancedSettingsPage,
-        ];
-    }
-
-    private function initializeGeneralSettingsSection()
-    {
-        $section = new Section('Cài Đặt Chung');
-        $section->addField(new Field('site_logo', 'Logo của Trang', 'input'));
-        $section->addField(new Field('site_description', 'Mô Tả Trang', 'textarea'));
-        return $section;
-    }
-
-    private function initializeColorSettingsSection()
-    {
-        $section = new Section('Cài Đặt Màu Sắc');
-        $section->addField(new Field('color_scheme', 'Màu Sắc', 'select', [
-            'options' => [
-                'light' => 'Sáng',
-                'dark' => 'Tối'
-            ]
-        ]));
-        return $section;
-    }
-
-    private function initializeFeatureSettingsSection()
-    {
-        $section = new Section('Cài Đặt Tính Năng');
-        $section->addField(new Field('enable_feature_x', 'Kích Hoạt Tính Năng X', 'select', [
-            'options' => [
-                'yes' => 'Có',
-                'no' => 'Không'
-            ]
-        ]));
-        return $section;
     }
 
     public function addOptionsPage()
@@ -135,5 +80,11 @@ class OptionFramework
     {
         $options = get_option($this->instance_name);
         wp_send_json_success(json_decode($options));
+    }
+
+    // Phương thức để thêm page
+    public function addPage(Page $page)
+    {
+        $this->pages[$page->title] = $page; // Sử dụng title làm key
     }
 }
