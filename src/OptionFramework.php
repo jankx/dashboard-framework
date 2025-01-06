@@ -114,13 +114,16 @@ class OptionFramework
     public function enqueueScripts()
     {
         // /Users/puleeno/Projects/xanhvina.com/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/src/OptionFramework.php
-        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.16', ['wp-element'], null, true);
+        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.16', ['wp-element'], null, true);
     }
 
     public function saveOptions()
     {
-        // Kiểm tra nonce và quyền truy cập nếu cần
-        // $this->checkNonce(); // Nếu bạn có kiểm tra nonce, hãy gọi hàm này
+        // Kiểm tra nonce
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], $this->instance_name . '_nonce')) {
+            wp_send_json_error('Nonce không hợp lệ'); // Gửi phản hồi lỗi
+            return;
+        }
 
         // Lấy dữ liệu từ yêu cầu
         $data = json_decode(file_get_contents('php://input'), true);
