@@ -14,7 +14,7 @@ import {
     fetchOptionsRequest,
     saveOptionsRequest,
 } from '../actions';
-import '../assets/style.scss';
+import '../assets/styles.scss';
 
 class OptionFrameworkApp extends Component {
     constructor(props) {

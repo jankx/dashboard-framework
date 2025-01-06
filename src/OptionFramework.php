@@ -60,6 +60,9 @@ class OptionFramework
 
     public function renderOptionsPage()
     {
+        // Tạo nonce
+        $nonce = wp_create_nonce('save_options_nonce');
+
         // Khai báo các field
         $field1 = new Field('site_logo', 'Logo của Trang', 'input');
         $field2 = new Field('site_description', 'Mô Tả Trang', 'textarea');
@@ -95,6 +98,10 @@ class OptionFramework
 
         // Truyền dữ liệu sang JavaScript
         wp_localize_script('react-app', 'optionsData', $optionsData);
+        wp_localize_script('react-app', 'jankxOptionAjax', [
+            'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => $nonce
+        ]);
 
         ?>
         <div id="option-framework-app"></div>
@@ -107,7 +114,7 @@ class OptionFramework
     public function enqueueScripts()
     {
         // /Users/puleeno/Projects/xanhvina.com/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/src/OptionFramework.php
-        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.14', ['wp-element'], null, true);
+        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.16', ['wp-element'], null, true);
     }
 
     public function saveOptions()
