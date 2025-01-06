@@ -1,4 +1,5 @@
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: './gui/index.js',
@@ -15,6 +16,14 @@ module.exports = {
                 use: {
                     loader: 'babel-loader'
                 }
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    'sass-loader'
+                ],
             }
         ]
     },
@@ -27,5 +36,10 @@ module.exports = {
         port: 3000,
         historyApiFallback: true
     },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: 'styles.css',
+        }),
+    ],
     mode: 'development'
 };
