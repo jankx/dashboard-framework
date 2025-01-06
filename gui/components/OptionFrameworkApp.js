@@ -21,6 +21,7 @@ class OptionFrameworkApp extends Component {
         this.state = {
             currentPage: Object.keys(props.optionsData)[0],
             openSections: {},
+            formData: props.formData // Lưu trữ formData trong state
         };
     }
 
@@ -29,16 +30,21 @@ class OptionFrameworkApp extends Component {
     }
 
     handleChange = (fieldId, value) => {
-        this.props.formData[fieldId] = value; // Cập nhật trực tiếp trong formData
+        this.setState(prevState => ({
+            formData: {
+                ...prevState.formData,
+                [fieldId]: value
+            }
+        }));
     };
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.saveOptions(this.props.formData);
+        this.props.saveOptions(this.state.formData);
     };
 
     renderField = (fieldId, field) => {
-        const value = this.props.formData[fieldId] || '';
+        const value = this.state.formData[fieldId] || '';
 
         switch (field.type) {
             case 'input':
