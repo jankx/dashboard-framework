@@ -136,13 +136,13 @@ class OptionFrameworkApp extends Component {
                             <Typography variant="h6" onClick={() => this.handleToggleSection(sectionId)}>
                                 {section.title}
                             </Typography>
-                            <Collapse in={openSections[sectionId]} timeout="auto" unmountOnExit>
+                            <Box>
                                 {section.fields.map((field) => (
                                     <Box key={field.id}>
                                         {this.renderField(field.id, field)}
                                     </Box>
                                 ))}
-                            </Collapse>
+                            </Box>
                         </Box>
                     ))}
                     <Button type="submit" variant="contained" color="primary">

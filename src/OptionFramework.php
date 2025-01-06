@@ -55,7 +55,7 @@ class OptionFramework
 
     public function enqueueScripts()
     {
-        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.16', ['wp-element'], null, true);
+        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.17', ['wp-element'], null, true);
     }
 
     public function saveOptions()
