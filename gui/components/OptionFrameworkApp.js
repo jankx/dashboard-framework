@@ -26,7 +26,14 @@ class OptionFrameworkApp extends Component {
     }
 
     componentDidMount() {
-        this.props.fetchOptions();
+        this.props.fetchOptions(); // Fetch dữ liệu từ server
+    }
+
+    componentDidUpdate(prevProps) {
+        // Cập nhật formData khi props.formData thay đổi
+        if (prevProps.formData !== this.props.formData) {
+            this.setState({ formData: this.props.formData });
+        }
     }
 
     handleChange = (fieldId, value) => {
