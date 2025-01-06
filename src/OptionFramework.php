@@ -56,19 +56,84 @@ class OptionFramework
 
     public function renderOptionsPage()
     {
+    // Khai báo dữ liệu cho các page, section và field
+        $optionsData = [
+        'general_settings' => [
+            'title' => 'Cài Đặt Chung',
+            'sections' => [
+                'site_info' => [
+                    'title' => 'Thông Tin Trang',
+                    'fields' => [
+                        [
+                            'id' => 'site_logo',
+                            'title' => 'Logo của Trang',
+                            'type' => 'input',
+                            'args' => []
+                        ],
+                        [
+                            'id' => 'site_description',
+                            'title' => 'Mô Tả Trang',
+                            'type' => 'textarea',
+                            'args' => []
+                        ]
+                    ]
+                ],
+                'color_settings' => [
+                    'title' => 'Cài Đặt Màu Sắc',
+                    'fields' => [
+                        [
+                            'id' => 'color_scheme',
+                            'title' => 'Màu Sắc',
+                            'type' => 'select',
+                            'args' => [
+                                'options' => [
+                                    'light' => 'Sáng',
+                                    'dark' => 'Tối'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ],
+        'advanced_settings' => [
+            'title' => 'Cài Đặt Nâng Cao',
+            'sections' => [
+                'feature_settings' => [
+                    'title' => 'Cài Đặt Tính Năng',
+                    'fields' => [
+                        [
+                            'id' => 'enable_feature_x',
+                            'title' => 'Kích Hoạt Tính Năng X',
+                            'type' => 'select',
+                            'args' => [
+                                'options' => [
+                                    'yes' => 'Có',
+                                    'no' => 'Không'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]
+        ];
+
+    // Truyền dữ liệu sang JavaScript
+        wp_localize_script('react-app', 'optionsData', $optionsData);
+
         ?>
-        <div id="option-framework-app"></div>
-        <script type="text/javascript">
-            const optionsData = <?php echo json_encode($this->sections); ?>;
-            const instanceName = '<?php echo esc_js($this->instance_name); ?>';
-        </script>
+    <div id="option-framework-app"></div>
+    <script type="text/javascript">
+        const instanceName = '<?php echo esc_js($this->instance_name); ?>';
+    </script>
         <?php
     }
 
     public function enqueueScripts()
     {
         // /Users/puleeno/Projects/xanhvina.com/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/src/OptionFramework.php
-        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.13', ['wp-element'], null, true);
+        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.14', ['wp-element'], null, true);
     }
 
     public function saveOptions()

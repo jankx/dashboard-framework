@@ -8,76 +8,16 @@
 
    const theme = createTheme(); // You can customize the theme here
 
-   const optionsData = {
-       general_settings: {
-           title: 'Cài Đặt Chung',
-           sections: {
-               site_info: {
-                   title: 'Thông Tin Trang',
-                   fields: [
-                       {
-                           id: 'site_logo',
-                           title: 'Logo của Trang',
-                           type: 'input',
-                           args: {}
-                       },
-                       {
-                           id: 'site_description',
-                           title: 'Mô Tả Trang',
-                           type: 'textarea',
-                           args: {}
-                       }
-                   ]
-               },
-               color_settings: {
-                   title: 'Cài Đặt Màu Sắc',
-                   fields: [
-                       {
-                           id: 'color_scheme',
-                           title: 'Màu Sắc',
-                           type: 'select',
-                           args: {
-                               options: {
-                                   light: 'Sáng',
-                                   dark: 'Tối'
-                               }
-                           }
-                       }
-                   ]
-               }
-           }
-       },
-       advanced_settings: {
-           title: 'Cài Đặt Nâng Cao',
-           sections: {
-               feature_settings: {
-                   title: 'Cài Đặt Tính Năng',
-                   fields: [
-                       {
-                           id: 'enable_feature_x',
-                           title: 'Kích Hoạt Tính Năng X',
-                           type: 'select',
-                           args: {
-                               options: {
-                                   yes: 'Có',
-                                   no: 'Không'
-                               }
-                           }
-                       }
-                   ]
-               }
-           }
-       }
-   };
+   // Sử dụng dữ liệu từ PHP
+   const optionsData = window.optionsData;
 
-// Ensure the DOM is ready before rendering
-document.addEventListener('DOMContentLoaded', () => {
-    ReactDOM.render(
-        <Provider store={store}>
-            <ThemeProvider theme={theme}>
-                <OptionFrameworkApp optionsData={optionsData} instanceName="my_custom_theme" />
-            </ThemeProvider>
-        </Provider>,
-        document.getElementById('option-framework-app')
-    );
-});
+   document.addEventListener('DOMContentLoaded', () => {
+       ReactDOM.render(
+           <Provider store={store}>
+               <ThemeProvider theme={theme}>
+                   <OptionFrameworkApp optionsData={optionsData} instanceName="my_custom_theme" />
+               </ThemeProvider>
+           </Provider>,
+           document.getElementById('option-framework-app')
+       );
+   });
