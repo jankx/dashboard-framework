@@ -68,7 +68,7 @@ class OptionFramework
     public function enqueueScripts()
     {
         // /Users/puleeno/Projects/xanhvina.com/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/src/OptionFramework.php
-        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.2', ['wp-element'], null, true);
+        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.0.9', ['wp-element'], null, true);
     }
 
     public function saveOptions()

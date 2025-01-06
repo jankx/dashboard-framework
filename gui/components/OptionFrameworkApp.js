@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
     TextField,
     Button,
@@ -7,70 +8,37 @@ import {
     Box,
     List,
     ListItem,
-    ListItemText,
     Collapse,
 } from '@mui/material';
-import { ExpandLess, ExpandMore } from '@mui/icons-material';
-import axios from 'axios';
+import {
+    fetchOptionsRequest,
+    saveOptionsRequest,
+} from '../actions';
 
-const OptionFrameworkApp = ({ optionsData, instanceName }) => {
-    const [formData, setFormData] = useState({});
-    const [openSections, setOpenSections] = useState({});
-    const [currentPage, setCurrentPage] = useState('general_settings'); // Mặc định là page đầu tiên
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchOptions = async () => {
-            try {
-                const response = await axios.get('/wp-admin/admin-ajax.php', {
-                    params: {
-                        action: 'fetch_options', // Gọi action để lấy dữ liệu
-                    },
-                });
-                if (response.data.success) {
-                    setFormData(response.data.data || {}); // Cập nhật formData với dữ liệu đã lấy
-                } else {
-                    setError('Không thể lấy dữ liệu cài đặt');
-                }
-            } catch (err) {
-                setError('Lỗi khi lấy dữ liệu cài đặt');
-            } finally {
-                setLoading(false);
-            }
+class OptionFrameworkApp extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            currentPage: Object.keys(props.optionsData)[0],
+            openSections: {},
         };
+    }
 
-        fetchOptions();
-    }, []);
+    componentDidMount() {
+        this.props.fetchOptions();
+    }
 
-    const handleChange = (fieldId, value) => {
-        setFormData(prevData => ({ ...prevData, [fieldId]: value }));
+    handleChange = (fieldId, value) => {
+        this.props.formData[fieldId] = value; // Cập nhật trực tiếp trong formData
     };
 
-    const handleSubmit = async (e) => {
+    handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData) {
-            setError('Dữ liệu biểu mẫu không được xác định');
-            return;
-        }
-        try {
-
-            // Gửi formData dưới dạng JSON trong phần thân của yêu cầu
-            await axios.post('/wp-admin/admin-ajax.php?action=save_options', {
-                headers: {
-                    'Content-Type': 'application/json' // Đặt tiêu đề Content-Type
-                },
-                data: JSON.stringify(formData) // Gửi formData dưới dạng JSON
-            });
-
-            alert('Cài đặt đã được lưu thành công!');
-        } catch (err) {
-            setError('Lỗi khi lưu cài đặt');
-        }
+        this.props.saveOptions(this.props.formData);
     };
 
-    const renderField = (fieldId, field) => {
-        const value = formData[fieldId] || '';
+    renderField = (fieldId, field) => {
+        const value = this.props.formData[fieldId] || '';
 
         switch (field.type) {
             case 'input':
@@ -78,7 +46,7 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
                     <TextField
                         label={field.title}
                         value={value}
-                        onChange={(e) => handleChange(fieldId, e.target.value)}
+                        onChange={(e) => this.handleChange(fieldId, e.target.value)}
                         fullWidth
                         margin="normal"
                     />
@@ -89,7 +57,7 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
                     <TextField
                         label={field.title}
                         value={value}
-                        onChange={(e) => handleChange(fieldId, e.target.value)}
+                        onChange={(e) => this.handleChange(fieldId, e.target.value)}
                         multiline
                         rows={4}
                         fullWidth
@@ -103,7 +71,7 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
                         select
                         label={field.title}
                         value={value}
-                        onChange={(e) => handleChange(fieldId, e.target.value)}
+                        onChange={(e) => this.handleChange(fieldId, e.target.value)}
                         fullWidth
                         margin="normal"
                     >
@@ -120,42 +88,67 @@ const OptionFrameworkApp = ({ optionsData, instanceName }) => {
         }
     };
 
-    const handleToggleSection = (sectionId) => {
-        setOpenSections(prev => ({ ...prev, [sectionId]: !prev[sectionId] }));
+    handleToggleSection = (sectionId) => {
+        this.setState(prevState => ({
+            openSections: { ...prevState.openSections, [sectionId]: !prevState.openSections[sectionId] },
+        }));
     };
 
-    return (
-        <Box sx={{ display: 'flex', height: '100vh' }}>
-            {/* Sidebar */}
-            <Box sx={{ width: '20%', padding: 2, backgroundColor: '#f0f0f0' }}>
-                <Typography variant="h6">Navigation</Typography>
-                <List>
-                    {Object.entries(optionsData).map(([pageId, page]) => (
-                        <ListItem button key={pageId} onClick={() => setCurrentPage(pageId)}>
-                            <ListItemText primary={page.title} />
-                        </ListItem>
-                    ))}
-                </List>
-            </Box>
+    render() {
+        const { loading, error, optionsData } = this.props;
+        const { currentPage, openSections } = this.state;
 
-            {/* Nội dung chính */}
-            <Box component="form" onSubmit={handleSubmit} sx={{ width: '80%', padding: 2 }}>
-                {Object.entries(optionsData[currentPage].sections).map(([sectionId, section]) => (
-                    <Box key={sectionId} sx={{ marginBottom: 3 }}>
-                        <Typography variant="h6">{section.title}</Typography>
-                        {section.fields.map((field) => (
-                            <Box key={field.id}>
-                                {renderField(field.id, field)}
-                            </Box>
+        if (loading) return <Typography>Loading...</Typography>;
+        if (error) return <Typography color="error">{error}</Typography>;
+
+        return (
+            <Box sx={{ display: 'flex', height: '100vh' }} component="form" onSubmit={this.handleSubmit}>
+                {/* Sidebar Navigation */}
+                <Box sx={{ width: '240px', padding: 2, backgroundColor: '#f0f0f0', position: 'fixed', height: '100vh' }}>
+                    <Typography variant="h6">Navigation</Typography>
+                    <List>
+                        {Object.entries(optionsData).map(([pageId, page]) => (
+                            <ListItem button="true" key={pageId} onClick={() => this.setState({ currentPage: pageId })}>
+                                <Typography variant="body1">{page.title}</Typography>
+                            </ListItem>
                         ))}
-                    </Box>
-                ))}
-                <Button type="submit" variant="contained" color="primary">
-                    Lưu
-                </Button>
+                    </List>
+                </Box>
+
+                {/* Main Content */}
+                <Box sx={{ marginLeft: '240px', padding: 2, flexGrow: 1 }}>
+                    {Object.entries(optionsData[currentPage].sections).map(([sectionId, section]) => (
+                        <Box key={sectionId} sx={{ marginBottom: 3 }}>
+                            <Typography variant="h6" onClick={() => this.handleToggleSection(sectionId)}>
+                                {section.title}
+                            </Typography>
+                            <Collapse in={openSections[sectionId]} timeout="auto" unmountOnExit>
+                                {section.fields.map((field) => (
+                                    <Box key={field.id}>
+                                        {this.renderField(field.id, field)}
+                                    </Box>
+                                ))}
+                            </Collapse>
+                        </Box>
+                    ))}
+                    <Button type="submit" variant="contained" color="primary">
+                        Lưu
+                    </Button>
+                </Box>
             </Box>
-        </Box>
-    );
+        );
+    }
+}
+
+const mapStateToProps = (state) => ({
+    formData: state.formData,
+    loading: state.loading,
+    error: state.error,
+});
+
+const mapDispatchToProps = {
+    fetchOptions: fetchOptionsRequest,
+    saveOptions: saveOptionsRequest,
 };
 
-export default OptionFrameworkApp;
+export default connect(mapStateToProps, mapDispatchToProps)(OptionFrameworkApp);
