@@ -55,7 +55,15 @@ class OptionFramework
 
     public function enqueueScripts()
     {
-        wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.17', ['wp-element'], null, true);
+        // Lấy thông tin màn hình hiện tại
+        $screen = get_current_screen();
+
+        // Kiểm tra xem người dùng có đang ở trên trang tùy chọn của instance không
+        if (str_contains($screen->id, "{$this->instance_name}-options")) {
+            // Tải script và CSS chỉ khi ở trên trang tùy chọn
+            wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.16', ['wp-element'], null, true);
+            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/style.css'); // Thêm CSS nếu cần
+        }
     }
 
     public function saveOptions()
