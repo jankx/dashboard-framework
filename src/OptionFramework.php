@@ -50,7 +50,8 @@ class OptionFramework
             'documentation_url' => '',
             'menu_position' => null,
             'menu_icon' => '',
-            'capability' => 'manage_options'
+            'capability' => 'manage_options',
+            'menu_type' => 'add_theme_menu'
         ]);
 
         return $this;
@@ -165,5 +166,28 @@ class OptionFramework
     public function getPageTitle()
     {
         return $this->page_title;
+    }
+
+    public function registerMenu()
+    {
+        if ($this->config['menu_type'] === 'add_menu_page') {
+            add_menu_page(
+                __('Theme Options', 'jankx'),
+                __('Theme Options', 'jankx'),
+                $this->config['capability'],
+                'jankx-theme-options',
+                [$this, 'renderPage'],
+                $this->config['menu_icon'],
+                $this->config['menu_position']
+            );
+        } else {
+            add_theme_page(
+                __('Theme Options', 'jankx'),
+                __('Theme Options', 'jankx'),
+                $this->config['capability'],
+                'jankx-theme-options',
+                [$this, 'renderPage']
+            );
+        }
     }
 }
