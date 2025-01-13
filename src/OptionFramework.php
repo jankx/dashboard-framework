@@ -156,4 +156,14 @@ class OptionFramework
     {
         $this->pages[$page->title] = $page; // Sử dụng title làm key
     }
+
+    public function getInstanceName()
+    {
+        return $this->instance_name;
+    }
+
+    public function getPageTitle()
+    {
+        return $this->page_title;
+    }
 }
