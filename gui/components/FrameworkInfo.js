@@ -19,11 +19,6 @@ const FrameworkInfo = ({ config }) => {
 
     return (
         <Box sx={{ mb: 4 }}>
-            {logo && (
-                <Box sx={{ mb: 2 }}>
-                    <img src={logo} alt="Logo" style={{ maxHeight: 50 }} />
-                </Box>
-            )}
             {version && (
                 <Typography variant="subtitle2" color="textSecondary">
                     Version {version}

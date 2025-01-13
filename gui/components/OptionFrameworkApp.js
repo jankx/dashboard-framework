@@ -58,6 +58,7 @@ class OptionFrameworkApp extends Component {
 
         switch (field.type) {
             case 'input':
+            case 'text':
                 return (
                     <TextField
                         label={field.title}
@@ -121,7 +122,13 @@ class OptionFrameworkApp extends Component {
             <Box sx={{ display: 'flex', height: '100vh' }} component="form" onSubmit={this.handleSubmit}>
                 {/* Sidebar Navigation */}
                 <Box sx={{ width: '240px', padding: 2, backgroundColor: '#f0f0f0', position: 'fixed', height: '100vh' }}>
-                    <Typography variant="h6">Navigation</Typography>
+                    {window.frameworkConfig.logo ? (
+                        <Box sx={{ mb: 2 }}>
+                            <img src={window.frameworkConfig.logo} alt="Logo" style={{ maxWidth: '100%', height: 'auto' }} />
+                        </Box>
+                    ) : (
+                        <Typography variant="h6">Navigation</Typography>
+                    )}
                     <List>
                         {Object.entries(optionsData).map(([pageId, page]) => (
                             <ListItem button="true" key={pageId} onClick={() => this.setState({ currentPage: pageId })}>
