@@ -21,19 +21,26 @@ import Footer from './Footer';
 class OptionFrameworkApp extends Component {
     constructor(props) {
         super(props);
+        const fragment = window.location.hash.slice(1);
+        const initialPage = fragment || Object.keys(props.optionsData)[0];
+
         this.state = {
-            currentPage: Object.keys(props.optionsData)[0],
+            currentPage: initialPage,
             openSections: {},
-            formData: props.formData // Lưu trữ formData trong state
+            formData: props.formData
         };
     }
 
     componentDidMount() {
-        this.props.fetchOptions(); // Fetch dữ liệu từ server
+        this.props.fetchOptions();
+        window.addEventListener('hashchange', this.handleHashChange);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('hashchange', this.handleHashChange);
     }
 
     componentDidUpdate(prevProps) {
-        // Cập nhật formData khi props.formData thay đổi
         if (prevProps.formData !== this.props.formData) {
             this.setState({ formData: this.props.formData });
         }
@@ -111,6 +118,18 @@ class OptionFrameworkApp extends Component {
         }));
     };
 
+    handlePageChange = (pageId) => {
+        window.location.hash = pageId;
+        this.setState({ currentPage: pageId });
+    };
+
+    handleHashChange = () => {
+        const fragment = window.location.hash.slice(1);
+        if (fragment && this.props.optionsData[fragment]) {
+            this.setState({ currentPage: fragment });
+        }
+    };
+
     render() {
         const { loading, error, optionsData } = this.props;
         const { currentPage, openSections } = this.state;
@@ -131,7 +150,15 @@ class OptionFrameworkApp extends Component {
                     )}
                     <List>
                         {Object.entries(optionsData).map(([pageId, page]) => (
-                            <ListItem button="true" key={pageId} onClick={() => this.setState({ currentPage: pageId })}>
+                            <ListItem
+                                button="true"
+                                key={pageId}
+                                onClick={() => this.handlePageChange(pageId)}
+                                selected={this.state.currentPage === pageId}
+                                sx={{
+                                    backgroundColor: this.state.currentPage === pageId ? 'rgba(0, 0, 0, 0.08)' : 'transparent'
+                                }}
+                            >
                                 <Typography variant="body1">{page.title}</Typography>
                             </ListItem>
                         ))}
