@@ -16,6 +16,7 @@ import {
 } from '../actions';
 import '../assets/styles.scss';
 import FrameworkInfo from './FrameworkInfo';
+import Footer from './Footer';
 
 class OptionFrameworkApp extends Component {
     constructor(props) {
@@ -147,9 +148,10 @@ class OptionFrameworkApp extends Component {
                             </Box>
                         </Box>
                     ))}
-                    <Button type="submit" variant="contained" color="primary">
+                    <Button type="submit" variant="contained" color="primary" sx={{ mb: 4 }}>
                         Lưu
                     </Button>
+                    <Footer config={window.frameworkConfig} />
                 </Box>
             </Box>
         );
