@@ -15,6 +15,7 @@ import {
     saveOptionsRequest,
 } from '../actions';
 import '../assets/styles.scss';
+import FrameworkInfo from './FrameworkInfo';
 
 class OptionFrameworkApp extends Component {
     constructor(props) {
@@ -131,6 +132,7 @@ class OptionFrameworkApp extends Component {
 
                 {/* Main Content */}
                 <Box sx={{ marginLeft: '240px', padding: 2, flexGrow: 1 }}>
+                    <FrameworkInfo config={window.frameworkConfig} />
                     {Object.entries(optionsData[currentPage].sections).map(([sectionId, section]) => (
                         <Box key={sectionId} sx={{ marginBottom: 3 }}>
                             <Typography variant="h6" onClick={() => this.handleToggleSection(sectionId)}>
