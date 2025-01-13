@@ -21,11 +21,12 @@ import Footer from './Footer';
 class OptionFrameworkApp extends Component {
     constructor(props) {
         super(props);
-        const fragment = window.location.hash.slice(1);
+        const fragment = decodeURI(window.location.hash.slice(1));
         const initialPage = fragment || Object.keys(props.optionsData)[0];
 
         this.state = {
             currentPage: initialPage,
+            defaultPage: Object.keys(props.optionsData)[0],
             openSections: {},
             formData: props.formData
         };
@@ -132,10 +133,15 @@ class OptionFrameworkApp extends Component {
 
     render() {
         const { loading, error, optionsData } = this.props;
-        const { currentPage, openSections } = this.state;
+        const { currentPage, openSections, defaultPage } = this.state;
+
+        let activePage = currentPage;
 
         if (loading) return <Typography>Loading...</Typography>;
         if (error) return <Typography color="error">{error}</Typography>;
+        if (typeof optionsData[activePage] === 'undefined') {
+            activePage = defaultPage;
+        }
 
         return (
             <Box sx={{ display: 'flex', height: '100vh' }} component="form" onSubmit={this.handleSubmit}>
@@ -168,7 +174,7 @@ class OptionFrameworkApp extends Component {
                 {/* Main Content */}
                 <Box sx={{ marginLeft: '240px', padding: 2, flexGrow: 1 }}>
                     <FrameworkInfo config={window.frameworkConfig} />
-                    {Object.entries(optionsData[currentPage].sections).map(([sectionId, section]) => (
+                    {Object.entries(optionsData[activePage].sections).map(([sectionId, section]) => (
                         <Box key={sectionId} sx={{ marginBottom: 3 }}>
                             <Typography variant="h6" onClick={() => this.handleToggleSection(sectionId)}>
                                 {section.title}

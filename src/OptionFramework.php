@@ -123,8 +123,8 @@ class OptionFramework
         // Kiểm tra xem người dùng có đang ở trên trang tùy chọn của instance không
         if (str_contains($screen->id, "{$this->instance_name}-options")) {
             // Tải script và CSS chỉ khi ở trên trang tùy chọn
-            wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.23', ['wp-element'], null, true);
-            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/style.css?v=1.0.0.10'); // Thêm CSS nếu cần
+            wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.34', ['wp-element'], null, true);
+            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/style.css?v=1.0.0.20'); // Thêm CSS nếu cần
         }
     }
 
