@@ -6,6 +6,7 @@ use Jankx\Dashboard\Elements\Fields\SelectField;
 use Jankx\Dashboard\Elements\Fields\TextareaField;
 use Jankx\Dashboard\Elements\Fields\TextField;
 use Jankx\Dashboard\Elements\Fields\ImageField;
+use Jankx\Dashboard\Elements\Fields\IconField;
 
 class FieldFactory
 {
@@ -43,6 +44,9 @@ class FieldFactory
 
             case 'image':
                 return static::createImageField($id, $title, $args);
+
+            case 'icon':
+                return static::createIconField($id, $title, $args);
         }
 
         return null;
@@ -65,5 +69,10 @@ class FieldFactory
     protected static function createImageField($id, $title, $args)
     {
         return new ImageField($id, $title, $args);
+    }
+
+    protected static function createIconField($id, $title, $args)
+    {
+        return new IconField($id, $title, $args);
     }
 }
