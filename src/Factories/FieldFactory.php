@@ -5,6 +5,7 @@ namespace Jankx\Dashboard\Factories;
 use Jankx\Dashboard\Elements\Fields\SelectField;
 use Jankx\Dashboard\Elements\Fields\TextareaField;
 use Jankx\Dashboard\Elements\Fields\TextField;
+use Jankx\Dashboard\Elements\Fields\ImageField;
 
 class FieldFactory
 {
@@ -39,6 +40,9 @@ class FieldFactory
             case 'dropdown':
             case 'option':
                 return static::createSelectField($id, $title, $args);
+
+            case 'image':
+                return static::createImageField($id, $title, $args);
         }
 
         return null;
@@ -56,5 +60,10 @@ class FieldFactory
         $selectField = new SelectField($id, $title, $args);
 
         return $selectField;
+    }
+
+    protected static function createImageField($id, $title, $args)
+    {
+        return new ImageField($id, $title, $args);
     }
 }

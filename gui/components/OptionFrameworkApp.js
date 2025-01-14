@@ -108,6 +108,47 @@ class OptionFrameworkApp extends Component {
                     </TextField>
                 );
 
+            case 'image':
+                return (
+                    <Box key={fieldId}>
+                        <Typography variant="subtitle1">{field.title}</Typography>
+                        <Box sx={{
+                            mt: 1,
+                            border: '1px dashed #ccc',
+                            p: 2,
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            '&:hover': {
+                                backgroundColor: '#f5f5f5'
+                            }
+                        }}
+                        onClick={() => this.openMediaLibrary(fieldId)}>
+                            {value ? (
+                                <Box>
+                                    <img
+                                        src={value}
+                                        alt="Selected"
+                                        style={{maxWidth: '200px', maxHeight: '200px'}}
+                                    />
+                                    <Button
+                                        sx={{mt: 1}}
+                                        variant="outlined"
+                                        color="error"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            this.handleChange(fieldId, '');
+                                        }}
+                                    >
+                                        Remove Image
+                                    </Button>
+                                </Box>
+                            ) : (
+                                <Typography>Click to select image</Typography>
+                            )}
+                        </Box>
+                    </Box>
+                );
+
             default:
                 return null;
         }
@@ -129,6 +170,28 @@ class OptionFrameworkApp extends Component {
         if (fragment && this.props.optionsData[fragment]) {
             this.setState({ currentPage: fragment });
         }
+    };
+
+    openMediaLibrary = (fieldId) => {
+        // Create media frame if not exists
+        if (!this.wp_media_frame) {
+            this.wp_media_frame = window.wp.media({
+                title: 'Select Image',
+                button: {
+                    text: 'Use this image'
+                },
+                multiple: false
+            });
+
+            // When image selected
+            this.wp_media_frame.on('select', () => {
+                const attachment = this.wp_media_frame.state().get('selection').first().toJSON();
+                this.handleChange(this.current_field_id, attachment.url);
+            });
+        }
+
+        this.current_field_id = fieldId;
+        this.wp_media_frame.open();
     };
 
     render() {
