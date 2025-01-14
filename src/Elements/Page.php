@@ -3,11 +3,12 @@
 namespace Jankx\Dashboard\Elements;
 
 use Jankx\Dashboard\Interfaces\PageInterface;
+use JsonSerializable;
 
-class Page implements PageInterface
+class Page implements PageInterface, JsonSerializable
 {
-    public $title;
-    public $sections;
+    protected $title;
+    protected $sections;
 
     public function __construct($title, $sections = [])
     {
@@ -31,5 +32,15 @@ class Page implements PageInterface
             return [];
         }
         return $this->sections;
+    }
+
+
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'title' => $this->title,
+            'sections' => $this->sections,
+        ];
     }
 }

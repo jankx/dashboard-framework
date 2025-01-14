@@ -9,4 +9,3 @@ class TextareaField extends Field implements TextareaFieldInterface
 {
     protected $type = 'textarea';
 }
-

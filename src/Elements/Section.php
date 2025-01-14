@@ -3,11 +3,12 @@
 namespace Jankx\Dashboard\Elements;
 
 use Jankx\Dashboard\Interfaces\SectionInterface;
+use JsonSerializable;
 
-class Section implements SectionInterface
+class Section implements SectionInterface, JsonSerializable
 {
-    public $title;
-    public $fields;
+    protected $title;
+    protected $fields;
 
     public function __construct($title, $fields = [])
     {
@@ -28,5 +29,13 @@ class Section implements SectionInterface
     public function getFields()
     {
         return $this->fields;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'title' => $this->title,
+            'fields' => $this->fields,
+        ];
     }
 }

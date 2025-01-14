@@ -161,7 +161,7 @@ class OptionFramework
     // Phương thức để thêm page
     public function addPage(Page $page)
     {
-        $this->pages[$page->title] = $page; // Sử dụng title làm key
+        $this->pages[$page->getTitle()] = $page; // Sử dụng title làm key
     }
 
     public function getInstanceName()

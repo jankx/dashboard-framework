@@ -3,8 +3,9 @@
 namespace Jankx\Dashboard\Elements;
 
 use Jankx\Dashboard\Interfaces\FieldInterface;
+use JsonSerializable;
 
-abstract class Field implements FieldInterface
+abstract class Field implements FieldInterface, JsonSerializable
 {
     protected $id;
     protected $title;
@@ -37,5 +38,15 @@ abstract class Field implements FieldInterface
     public function getArgs()
     {
         return $this->args;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'type' => $this->type,
+            'args' => $this->args,
+        ];
     }
 }
