@@ -4,18 +4,18 @@ namespace Jankx\Dashboard\Elements;
 
 use Jankx\Dashboard\Interfaces\FieldInterface;
 
-class Field implements FieldInterface
+abstract class Field implements FieldInterface
 {
-    public $id;
-    public $title;
-    public $type;
-    public $args;
+    protected $id;
+    protected $title;
+    protected $type;
+    protected $args;
 
-    public function __construct($id, $title, $type, $args = [])
+
+    public function __construct($id, $title, $args = [])
     {
         $this->id = $id;
         $this->title = $title;
-        $this->type = $type;
         $this->args = $args;
     }
 
