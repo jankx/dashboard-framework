@@ -2,7 +2,9 @@
 
 namespace Jankx\Dashboard\Elements;
 
-class Field
+use Jankx\Dashboard\Interfaces\FieldInterface;
+
+class Field implements FieldInterface
 {
     public $id;
     public $title;

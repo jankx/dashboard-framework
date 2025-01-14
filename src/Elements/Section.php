@@ -2,7 +2,9 @@
 
 namespace Jankx\Dashboard\Elements;
 
-class Section
+use Jankx\Dashboard\Interfaces\SectionInterface;
+
+class Section implements SectionInterface
 {
     public $title;
     public $fields;

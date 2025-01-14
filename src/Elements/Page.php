@@ -2,7 +2,9 @@
 
 namespace Jankx\Dashboard\Elements;
 
-class Page
+use Jankx\Dashboard\Interfaces\PageInterface;
+
+class Page implements PageInterface
 {
     public $title;
     public $sections;
