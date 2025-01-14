@@ -2,7 +2,7 @@
 
 namespace Jankx\Dashboard\Factories;
 
-use Jankx\Dashboard\Elements\Field;
+use Jankx\Dashboard\Elements\Fields\SelectField;
 use Jankx\Dashboard\Elements\Fields\TextareaField;
 use Jankx\Dashboard\Elements\Fields\TextField;
 
@@ -34,6 +34,11 @@ class FieldFactory
 
             case 'textarea':
                 return static::createTextareaField($id, $title, $args);
+
+            case 'select':
+            case 'dropdown':
+            case 'option':
+                return static::createSelectField($id, $title, $args);
         }
 
         return null;
@@ -44,5 +49,12 @@ class FieldFactory
         $textareaField = new TextareaField($id, $title, $args);
 
         return $textareaField;
+    }
+
+    protected static function createSelectField($id, $title, $args)
+    {
+        $selectField = new SelectField($id, $title, $args);
+
+        return $selectField;
     }
 }
