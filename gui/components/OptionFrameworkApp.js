@@ -17,6 +17,7 @@ import {
 import '../assets/styles.scss';
 import FrameworkInfo from './FrameworkInfo';
 import Footer from './Footer';
+import FieldFactory from '../fields/FieldFactory';
 
 class OptionFrameworkApp extends Component {
     constructor(props) {
@@ -62,96 +63,8 @@ class OptionFrameworkApp extends Component {
     };
 
     renderField = (fieldId, field) => {
-        const value = this.state.formData[fieldId] || '';
-
-        switch (field.type) {
-            case 'input':
-            case 'text':
-                return (
-                    <TextField
-                        label={field.title}
-                        value={value}
-                        onChange={(e) => this.handleChange(fieldId, e.target.value)}
-                        fullWidth
-                        margin="normal"
-                    />
-                );
-
-            case 'textarea':
-                return (
-                    <TextField
-                        label={field.title}
-                        value={value}
-                        onChange={(e) => this.handleChange(fieldId, e.target.value)}
-                        multiline
-                        rows={4}
-                        fullWidth
-                        margin="normal"
-                    />
-                );
-
-            case 'select':
-                return (
-                    <TextField
-                        select
-                        label={field.title}
-                        value={value}
-                        onChange={(e) => this.handleChange(fieldId, e.target.value)}
-                        fullWidth
-                        margin="normal"
-                    >
-                        {Object.entries(field.args.options).map(([optionValue, optionLabel]) => (
-                            <MenuItem key={optionValue} value={optionValue}>
-                                {optionLabel}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                );
-
-            case 'image':
-                return (
-                    <Box key={fieldId}>
-                        <Typography variant="subtitle1">{field.title}</Typography>
-                        <Box sx={{
-                            mt: 1,
-                            border: '1px dashed #ccc',
-                            p: 2,
-                            textAlign: 'center',
-                            cursor: 'pointer',
-                            '&:hover': {
-                                backgroundColor: '#f5f5f5'
-                            }
-                        }}
-                        onClick={() => this.openMediaLibrary(fieldId)}>
-                            {value ? (
-                                <Box>
-                                    <img
-                                        src={value}
-                                        alt="Selected"
-                                        style={{maxWidth: '200px', maxHeight: '200px'}}
-                                    />
-                                    <Button
-                                        sx={{mt: 1}}
-                                        variant="outlined"
-                                        color="error"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            this.handleChange(fieldId, '');
-                                        }}
-                                    >
-                                        Remove Image
-                                    </Button>
-                                </Box>
-                            ) : (
-                                <Typography>Click to select image</Typography>
-                            )}
-                        </Box>
-                    </Box>
-                );
-
-            default:
-                return null;
-        }
+        const fieldInstance = FieldFactory.create(fieldId, field, this.handleChange);
+        return fieldInstance ? fieldInstance.render(this.state.formData) : null;
     };
 
     handleToggleSection = (sectionId) => {
@@ -170,28 +83,6 @@ class OptionFrameworkApp extends Component {
         if (fragment && this.props.optionsData[fragment]) {
             this.setState({ currentPage: fragment });
         }
-    };
-
-    openMediaLibrary = (fieldId) => {
-        // Create media frame if not exists
-        if (!this.wp_media_frame) {
-            this.wp_media_frame = window.wp.media({
-                title: 'Select Image',
-                button: {
-                    text: 'Use this image'
-                },
-                multiple: false
-            });
-
-            // When image selected
-            this.wp_media_frame.on('select', () => {
-                const attachment = this.wp_media_frame.state().get('selection').first().toJSON();
-                this.handleChange(this.current_field_id, attachment.url);
-            });
-        }
-
-        this.current_field_id = fieldId;
-        this.wp_media_frame.open();
     };
 
     render() {
