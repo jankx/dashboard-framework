@@ -7,4 +7,6 @@ use Jankx\Dashboard\Interfaces\Fields\TextareaFieldInterface;
 
 class TextareaField extends Field implements TextareaFieldInterface
 {
+    protected $type = 'textarea';
 }
+
