@@ -18,4 +18,31 @@ class Field implements FieldInterface
         $this->type = $type;
         $this->args = $args;
     }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function getArgs()
+    {
+        if ($this->type === 'select') {
+            return [
+                'options' => [
+                    $this->id
+                ]
+            ];
+        }
+        return $this->args;
+    }
 }

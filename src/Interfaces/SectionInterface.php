@@ -1,5 +1,8 @@
 <?php
+
 namespace Jankx\Dashboard\Interfaces;
 
-interface SectionInterface {
+interface SectionInterface
+{
+    public function getTitle();
 }

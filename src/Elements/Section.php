@@ -19,4 +19,14 @@ class Section implements SectionInterface
     {
         $this->fields[] = $field;
     }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function getFields()
+    {
+        return $this->fields;
+    }
 }

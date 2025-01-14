@@ -19,4 +19,17 @@ class Page implements PageInterface
     {
         $this->sections[] = $section;
     }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function getSections()
+    {
+        if (!is_array($this->sections)) {
+            return [];
+        }
+        return $this->sections;
+    }
 }

@@ -1,5 +1,14 @@
 <?php
+
 namespace Jankx\Dashboard\Interfaces;
 
-interface FieldInterface {
+interface FieldInterface
+{
+    public function getId();
+
+    public function getType();
+
+    public function getTitle();
+
+    public function getArgs();
 }

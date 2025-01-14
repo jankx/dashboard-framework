@@ -58,27 +58,33 @@ class OptionFramework
     }
 
     // Các phương thức getter cho config
-    public function getLogo() {
+    public function getLogo()
+    {
         return $this->config['logo'] ?? '';
     }
 
-    public function getVersion() {
+    public function getVersion()
+    {
         return $this->config['version'] ?? '1.0.0';
     }
 
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->config['description'] ?? '';
     }
 
-    public function getSocialLinks() {
+    public function getSocialLinks()
+    {
         return $this->config['social_links'] ?? [];
     }
 
-    public function getSupportUrl() {
+    public function getSupportUrl()
+    {
         return $this->config['support_url'] ?? '';
     }
 
-    public function getDocumentationUrl() {
+    public function getDocumentationUrl()
+    {
         return $this->config['documentation_url'] ?? '';
     }
 
