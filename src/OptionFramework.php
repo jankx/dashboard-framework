@@ -129,16 +129,38 @@ class OptionFramework
         // Kiểm tra xem người dùng có đang ở trên trang tùy chọn của instance không
         if (str_contains($screen->id, "{$this->instance_name}-options")) {
             // Tải script và CSS chỉ khi ở trên trang tùy chọn
-            wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.37', ['wp-element'], null, true);
-            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/style.css?v=1.0.0.23'); // Thêm CSS nếu cần
+            wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.40', ['wp-element'], null, true);
+            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/style.css?v=1.0.0.26'); // Thêm CSS nếu cần
 
             // Add WordPress Media Uploader
             wp_enqueue_media();
 
-            // Add Icon Picker
+            // Add Icon Picker from Codeinwp
             wp_enqueue_style('dashicons');
-            wp_enqueue_script('icon-picker', 'path/to/icon-picker.js', ['jquery'], '1.0.0', true);
-            wp_enqueue_style('icon-picker', 'path/to/icon-picker.css');
+            wp_enqueue_script(
+                'icon-picker',
+                '/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/vendor/jankx/icon-picker/js/icon-picker.js',
+                ['jquery'],
+                '1.0.0',
+                true
+            );
+            wp_enqueue_style(
+                'icon-picker',
+                '/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/vendor/jankx/icon-picker/css/icon-picker.css'
+            );
+
+            // Localize icon picker data
+            wp_localize_script('icon-picker', 'iconPickerIcons', [
+                'dashicons' => [
+                    'name' => 'Dashicons',
+                    'icons' => [
+                        'dashicons-menu',
+                        'dashicons-admin-site',
+                        // ... thêm các icon khác
+                    ]
+                ],
+                // Thêm các bộ icon khác nếu cần
+            ]);
         }
     }
 

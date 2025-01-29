@@ -4,12 +4,12 @@ import { Add as AddIcon } from '@mui/icons-material';
 
 export default class IconField extends Field {
     openIconPicker() {
-        if (typeof window.iconPicker === 'undefined') {
+        if (typeof wp.media.view.MediaFrame.IconPicker === 'undefined') {
             console.error('Icon Picker not found');
             return;
         }
 
-        window.iconPicker.open({
+        wp.media.view.MediaFrame.IconPicker.selectIcon({
             target: this.id,
             onSelect: (icon) => {
                 this.onChange(this.id, icon);
