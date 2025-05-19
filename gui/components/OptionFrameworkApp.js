@@ -9,7 +9,7 @@ import {
     List,
     ListItem,
     Collapse,
-} from '@mui/material';
+} from '@chakra-ui/react';
 import {
     fetchOptionsRequest,
     saveOptionsRequest,
@@ -92,45 +92,43 @@ class OptionFrameworkApp extends Component {
         let activePage = currentPage;
 
         if (loading) return <Typography>Loading...</Typography>;
-        if (error) return <Typography color="error">{error}</Typography>;
+        if (error) return <Typography color="red.500">{error}</Typography>;
         if (typeof optionsData[activePage] === 'undefined') {
             activePage = defaultPage;
         }
 
         return (
-            <Box sx={{ display: 'flex', height: '100vh' }} component="form" onSubmit={this.handleSubmit}>
+            <Box display="flex" height="100vh" as="form" onSubmit={this.handleSubmit}>
                 {/* Sidebar Navigation */}
-                <Box sx={{ width: '240px', padding: 2, backgroundColor: '#f0f0f0', position: 'fixed', height: '100vh' }}>
+                <Box width="240px" p={2} bg="#f0f0f0" position="fixed" height="100vh">
                     {window.frameworkConfig.logo ? (
-                        <Box sx={{ mb: 2 }}>
+                        <Box mb={2}>
                             <img src={window.frameworkConfig.logo} alt="Logo" style={{ maxWidth: '100%', height: 'auto' }} />
                         </Box>
                     ) : (
-                        <Typography variant="h6">Navigation</Typography>
+                        <Typography fontSize="xl" fontWeight="bold">Navigation</Typography>
                     )}
                     <List>
                         {Object.entries(optionsData).map(([pageId, page]) => (
                             <ListItem
-                                button="true"
                                 key={pageId}
                                 onClick={() => this.handlePageChange(pageId)}
-                                selected={this.state.currentPage === pageId}
-                                sx={{
-                                    backgroundColor: this.state.currentPage === pageId ? 'rgba(0, 0, 0, 0.08)' : 'transparent'
-                                }}
+                                bg={this.state.currentPage === pageId ? 'rgba(0, 0, 0, 0.08)' : 'transparent'}
+                                cursor="pointer"
+                                fontWeight={this.state.currentPage === pageId ? 'bold' : 'normal'}
                             >
-                                <Typography variant="body1">{page.title}</Typography>
+                                <Typography>{page.title}</Typography>
                             </ListItem>
                         ))}
                     </List>
                 </Box>
 
                 {/* Main Content */}
-                <Box sx={{ marginLeft: '240px', padding: 2, flexGrow: 1 }}>
+                <Box ml="240px" p={2} flexGrow={1}>
                     <FrameworkInfo config={window.frameworkConfig} />
                     {Object.entries(optionsData[activePage].sections).map(([sectionId, section]) => (
-                        <Box key={sectionId} sx={{ marginBottom: 3 }}>
-                            <Typography variant="h6" onClick={() => this.handleToggleSection(sectionId)}>
+                        <Box key={sectionId} mb={3}>
+                            <Typography fontSize="lg" fontWeight="semibold" onClick={() => this.handleToggleSection(sectionId)}>
                                 {section.title}
                             </Typography>
                             <Box>
@@ -142,7 +140,7 @@ class OptionFrameworkApp extends Component {
                             </Box>
                         </Box>
                     ))}
-                    <Button type="submit" variant="contained" color="primary" sx={{ mb: 4 }}>
+                    <Button type="submit" colorScheme="blue" mb={4}>
                         Lưu
                     </Button>
                     <Footer config={window.frameworkConfig} />

@@ -1,5 +1,5 @@
 import Field from './Field';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Text, Button } from '@chakra-ui/react';
 
 export default class ImageField extends Field {
     openMediaLibrary() {
@@ -26,18 +26,16 @@ export default class ImageField extends Field {
 
         return (
             <Box key={this.id}>
-                <Typography variant="subtitle1">{this.field.title}</Typography>
-                <Box sx={{
-                    mt: 1,
-                    border: '1px dashed #ccc',
-                    p: 2,
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    '&:hover': {
-                        backgroundColor: '#f5f5f5'
-                    }
-                }}
-                onClick={() => this.openMediaLibrary()}>
+                <Text fontSize="md" fontWeight="semibold">{this.field.title}</Text>
+                <Box
+                    mt={1}
+                    border="1px dashed #ccc"
+                    p={2}
+                    textAlign="center"
+                    cursor="pointer"
+                    _hover={{ backgroundColor: '#f5f5f5' }}
+                    onClick={() => this.openMediaLibrary()}
+                >
                     {value ? (
                         <Box>
                             <img
@@ -46,9 +44,9 @@ export default class ImageField extends Field {
                                 style={{maxWidth: '200px', maxHeight: '200px'}}
                             />
                             <Button
-                                sx={{mt: 1}}
-                                variant="outlined"
-                                color="error"
+                                mt={1}
+                                variant="outline"
+                                colorScheme="red"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     this.onChange(this.id, '');
@@ -58,7 +56,7 @@ export default class ImageField extends Field {
                             </Button>
                         </Box>
                     ) : (
-                        <Typography>Click to select image</Typography>
+                        <Text>Click to select image</Text>
                     )}
                 </Box>
             </Box>

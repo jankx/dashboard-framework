@@ -1,19 +1,18 @@
 import Field from './Field';
-import { TextField as MUITextField } from '@mui/material';
+import { Input, FormControl, FormLabel } from '@chakra-ui/react';
 
 export default class TextField extends Field {
     render(formData) {
         const value = this.getValue(formData);
 
         return (
-            <MUITextField
-                key={this.id}
-                label={this.field.title}
-                value={value}
-                onChange={(e) => this.onChange(this.id, e.target.value)}
-                fullWidth
-                margin="normal"
-            />
+            <FormControl key={this.id}>
+                <FormLabel>{this.field.title}</FormLabel>
+                <Input
+                    value={value}
+                    onChange={(e) => this.onChange(this.id, e.target.value)}
+                />
+            </FormControl>
         );
     }
 }

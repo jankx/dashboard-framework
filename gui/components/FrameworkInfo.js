@@ -1,33 +1,20 @@
 import React from 'react';
-import {
-    Box,
-    Typography,
-    Link,
-    Stack,
-    IconButton,
-    Divider
-} from '@mui/material';
-import {
-    Facebook,
-    Twitter,
-    GitHub,
-    LinkedIn
-} from '@mui/icons-material';
+import { Text, Box } from '@chakra-ui/react';
 
 const FrameworkInfo = ({ config }) => {
     const { logo, version, description } = config;
 
     return (
-        <Box sx={{ mb: 4 }}>
+        <Box mb={4}>
             {version && (
-                <Typography variant="subtitle2" color="textSecondary">
+                <Text fontSize="sm" color="gray.500">
                     Version {version}
-                </Typography>
+                </Text>
             )}
             {description && (
-                <Typography variant="body2" sx={{ mt: 1 }}>
+                <Text fontSize="md" mt={1}>
                     {description}
-                </Typography>
+                </Text>
             )}
         </Box>
     );
