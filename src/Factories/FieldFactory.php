@@ -2,6 +2,10 @@
 
 namespace Jankx\Dashboard\Factories;
 
+if (!defined('ABSPATH')) {
+    exit('Cheatin huh?');
+}
+
 use Jankx\Dashboard\Elements\Fields\SelectField;
 use Jankx\Dashboard\Elements\Fields\TextareaField;
 use Jankx\Dashboard\Elements\Fields\TextField;
