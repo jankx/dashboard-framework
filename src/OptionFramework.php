@@ -3,7 +3,7 @@
 namespace Jankx\Dashboard;
 
 if (!defined('ABSPATH')) {
-    exit('Cheatin huh?');
+    exit('Cheating huh?');
 }
 
 use Jankx\Dashboard\Elements\Page;

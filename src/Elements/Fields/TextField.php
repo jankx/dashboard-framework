@@ -3,7 +3,7 @@
 namespace Jankx\Dashboard\Elements\Fields;
 
 if (!defined('ABSPATH')) {
-    exit('Cheatin huh?');
+    exit('Cheating huh?');
 }
 
 use Jankx\Dashboard\Elements\Field;
