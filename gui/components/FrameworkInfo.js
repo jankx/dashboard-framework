@@ -1,18 +1,6 @@
 import React from 'react';
-import {
-    Box,
-    Typography,
-    Link,
-    Stack,
-    IconButton,
-    Divider
-} from '@mui/material';
-import {
-    Facebook,
-    Twitter,
-    GitHub,
-    LinkedIn
-} from '@mui/icons-material';
+import { Box, Text, Button, Link } from '@chakra-ui/react';
+import { FaFacebook, FaTwitter, FaGithub, FaLinkedin } from 'react-icons/fa';
 
 const FrameworkInfo = ({ config }) => {
     const { logo, version, description } = config;
@@ -20,14 +8,14 @@ const FrameworkInfo = ({ config }) => {
     return (
         <Box sx={{ mb: 4 }}>
             {version && (
-                <Typography variant="subtitle2" color="textSecondary">
+                <Text variant="subtitle2" color="textSecondary">
                     Version {version}
-                </Typography>
+                </Text>
             )}
             {description && (
-                <Typography variant="body2" sx={{ mt: 1 }}>
+                <Text variant="body2" sx={{ mt: 1 }}>
                     {description}
-                </Typography>
+                </Text>
             )}
         </Box>
     );

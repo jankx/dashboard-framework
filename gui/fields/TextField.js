@@ -1,12 +1,12 @@
 import Field from './Field';
-import { TextField as MUITextField } from '@mui/material';
+import { Input } from '@chakra-ui/react';
 
 export default class TextField extends Field {
     render(formData) {
         const value = this.getValue(formData);
 
         return (
-            <MUITextField
+            <Input
                 key={this.id}
                 label={this.field.title}
                 value={value}

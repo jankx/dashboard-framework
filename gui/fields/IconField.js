@@ -1,6 +1,6 @@
 import Field from './Field';
-import { Box, Typography, IconButton } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
+import { Box, Text, IconButton } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
 
 export default class IconField extends Field {
     openIconPicker() {
@@ -22,7 +22,7 @@ export default class IconField extends Field {
 
         return (
             <Box key={this.id}>
-                <Typography variant="subtitle1">{this.field.title}</Typography>
+                <Text fontSize="xl">{this.field.title}</Text>
                 <Box sx={{
                     mt: 1,
                     display: 'flex',

@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-    TextField,
-    Button,
-    MenuItem,
-    Typography,
     Box,
+    Text,
+    Button,
     List,
     ListItem,
     Collapse,
-} from '@mui/material';
+    Heading,
+    useColorModeValue
+} from '@chakra-ui/react';
 import {
     fetchOptionsRequest,
     saveOptionsRequest,
@@ -91,58 +91,63 @@ class OptionFrameworkApp extends Component {
 
         let activePage = currentPage;
 
-        if (loading) return <Typography>Loading...</Typography>;
-        if (error) return <Typography color="error">{error}</Typography>;
+        if (loading) return <Text>Loading...</Text>;
+        if (error) return <Text color="red.500">{error}</Text>;
         if (typeof optionsData[activePage] === 'undefined') {
             activePage = defaultPage;
         }
 
         return (
-            <Box sx={{ display: 'flex', height: '100vh' }} component="form" onSubmit={this.handleSubmit}>
+            <Box display="flex" height="100vh" as="form" onSubmit={this.handleSubmit}>
                 {/* Sidebar Navigation */}
-                <Box sx={{ width: '240px', padding: 2, backgroundColor: '#f0f0f0', position: 'fixed', height: '100vh' }}>
+                <Box w="240px" p={4} bg="gray.50" position="fixed" height="100vh">
                     {window.frameworkConfig.logo ? (
-                        <Box sx={{ mb: 2 }}>
+                        <Box mb={4}>
                             <img src={window.frameworkConfig.logo} alt="Logo" style={{ maxWidth: '100%', height: 'auto' }} />
                         </Box>
                     ) : (
-                        <Typography variant="h6">Navigation</Typography>
+                        <Heading as="h3" size="md" mb={4}>Navigation</Heading>
                     )}
-                    <List>
+                    <List spacing={1}>
                         {Object.entries(optionsData).map(([pageId, page]) => (
                             <ListItem
-                                button="true"
                                 key={pageId}
+                                cursor="pointer"
+                                bg={this.state.currentPage === pageId ? 'gray.200' : 'transparent'}
+                                borderRadius="md"
+                                px={3}
+                                py={2}
+                                mb={1}
+                                fontWeight={this.state.currentPage === pageId ? 'bold' : 'normal'}
                                 onClick={() => this.handlePageChange(pageId)}
-                                selected={this.state.currentPage === pageId}
-                                sx={{
-                                    backgroundColor: this.state.currentPage === pageId ? 'rgba(0, 0, 0, 0.08)' : 'transparent'
-                                }}
+                                _hover={{ bg: 'gray.100' }}
                             >
-                                <Typography variant="body1">{page.title}</Typography>
+                                <Text>{page.title}</Text>
                             </ListItem>
                         ))}
                     </List>
                 </Box>
 
                 {/* Main Content */}
-                <Box sx={{ marginLeft: '240px', padding: 2, flexGrow: 1 }}>
+                <Box ml="240px" p={4} flexGrow={1}>
                     <FrameworkInfo config={window.frameworkConfig} />
                     {Object.entries(optionsData[activePage].sections).map(([sectionId, section]) => (
-                        <Box key={sectionId} sx={{ marginBottom: 3 }}>
-                            <Typography variant="h6" onClick={() => this.handleToggleSection(sectionId)}>
+                        <Box key={sectionId} mb={6}>
+                            <Heading as="h4" size="md" mb={2} cursor="pointer" onClick={() => this.handleToggleSection(sectionId)}>
                                 {section.title}
-                            </Typography>
-                            <Box>
-                                {section.fields.map((field) => (
-                                    <Box key={field.id}>
-                                        {this.renderField(field.id, field)}
-                                    </Box>
-                                ))}
-                            </Box>
+                            </Heading>
+                            <Collapse in={openSections[sectionId] !== false} animateOpacity>
+                                <Box>
+                                    {section.fields.map((field) => (
+                                        <Box key={field.id} mb={3}>
+                                            {this.renderField(field.id, field)}
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Collapse>
                         </Box>
                     ))}
-                    <Button type="submit" variant="contained" color="primary" sx={{ mb: 4 }}>
+                    <Button type="submit" colorScheme="blue" mb={8}>
                         Lưu
                     </Button>
                     <Footer config={window.frameworkConfig} />

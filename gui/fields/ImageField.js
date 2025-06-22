@@ -1,5 +1,5 @@
 import Field from './Field';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Text, Button } from '@chakra-ui/react';
 
 export default class ImageField extends Field {
     openMediaLibrary() {
@@ -26,7 +26,7 @@ export default class ImageField extends Field {
 
         return (
             <Box key={this.id}>
-                <Typography variant="subtitle1">{this.field.title}</Typography>
+                <Text fontSize="xl">{this.field.title}</Text>
                 <Box sx={{
                     mt: 1,
                     border: '1px dashed #ccc',
@@ -58,7 +58,7 @@ export default class ImageField extends Field {
                             </Button>
                         </Box>
                     ) : (
-                        <Typography>Click to select image</Typography>
+                        <Text>Click to select image</Text>
                     )}
                 </Box>
             </Box>
