@@ -15,10 +15,16 @@ class OptionFramework
     private $menu_text = 'Tùy Chọn';
     private $config;
     public $pages = [];
+    private static $built_in_options = [];
 
     public function __construct($instance_name)
     {
         $this->instance_name = $instance_name;
+
+        // Nếu có built-in options cho instance này thì merge vào pages
+        if (isset(self::$built_in_options[$instance_name])) {
+            $this->pages = array_merge($this->pages, self::$built_in_options[$instance_name]);
+        }
 
         add_action('admin_menu', [$this, 'addOptionsPage']);
         add_action('admin_enqueue_scripts', [$this, 'enqueueScripts']);
@@ -105,12 +111,47 @@ class OptionFramework
         );
     }
 
+    // Hàm merge sâu built-in options và user options, user luôn ưu tiên
+    private function mergeOptions($built_in, $user) {
+        foreach ($built_in as $page_id => $page) {
+            if (!isset($user[$page_id])) {
+                $user[$page_id] = $page;
+            } else {
+                // Merge sections
+                foreach ($page['sections'] as $section_id => $section) {
+                    if (!isset($user[$page_id]['sections'][$section_id])) {
+                        $user[$page_id]['sections'][$section_id] = $section;
+                    } else {
+                        // Merge fields
+                        $user_fields = $user[$page_id]['sections'][$section_id]['fields'] ?? [];
+                        $built_fields = $section['fields'] ?? [];
+                        $fields_by_id = [];
+                        foreach ($built_fields as $f) {
+                            $fields_by_id[$f['id']] = $f;
+                        }
+                        foreach ($user_fields as $f) {
+                            $fields_by_id[$f['id']] = $f; // user field ưu tiên
+                        }
+                        $user[$page_id]['sections'][$section_id]['fields'] = array_values($fields_by_id);
+                    }
+                }
+            }
+        }
+        return $user;
+    }
+
+    // Lấy options đã merge để truyền sang JS
+    public function getMergedPages() {
+        $built_in = self::$built_in_options[$this->instance_name] ?? [];
+        return $this->mergeOptions($built_in, $this->pages);
+    }
+
     public function renderOptionsPage()
     {
         $nonce = wp_create_nonce('save_options_nonce');
 
         // Truyền dữ liệu sang JavaScript
-        wp_localize_script('react-app', 'optionsData', $this->pages);
+        wp_localize_script('react-app', 'optionsData', $this->getMergedPages());
         wp_localize_script('react-app', 'frameworkConfig', $this->config);
         wp_localize_script('react-app', 'jankxOptionAjax', [
             'ajaxurl' => admin_url('admin-ajax.php'),
@@ -134,7 +175,7 @@ class OptionFramework
         if (str_contains($screen->id, "{$this->instance_name}-options")) {
             // Tải script và CSS chỉ khi ở trên trang tùy chọn
             wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.40', ['wp-element'], null, true);
-            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/style.css?v=1.0.0.26'); // Thêm CSS nếu cần
+            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/styles.css?v=1.0.0.26'); // Thêm CSS nếu cần
 
             // Add WordPress Media Uploader
             wp_enqueue_media();
@@ -229,5 +270,10 @@ class OptionFramework
                 [$this, 'renderPage']
             );
         }
+    }
+
+    public static function registerBuiltInOptions($instance_id, $options)
+    {
+        self::$built_in_options[$instance_id] = $options;
     }
 }
