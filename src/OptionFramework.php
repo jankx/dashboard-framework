@@ -211,17 +211,48 @@ class OptionFramework
 
     public function saveOptions()
     {
-        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'save_options_nonce')) {
+        // Include security helper if not already included
+        if (!class_exists('Jankx_Security_Helper')) {
+            require_once get_template_directory() . '/includes/security.php';
+        }
+
+        // Verify nonce using security helper
+        if (!Jankx_Security_Helper::verify_nonce('nonce', 'save_options_nonce')) {
             wp_send_json_error('Nonce không hợp lệ');
             return;
         }
 
-        $data = json_decode(file_get_contents('php://input'), true);
-        $data = json_decode($data['data'], true);
+        // Safely get input data
+        $input_data = file_get_contents('php://input');
+        if (empty($input_data)) {
+            wp_send_json_error('Không có dữ liệu được gửi');
+            return;
+        }
 
-        if (is_array($data)) {
-            update_option($this->instance_name, json_encode($data));
-            wp_send_json_success();
+        $data = json_decode($input_data, true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            wp_send_json_error('Dữ liệu JSON không hợp lệ');
+            return;
+        }
+
+        if (!isset($data['data'])) {
+            wp_send_json_error('Thiếu dữ liệu cần thiết');
+            return;
+        }
+
+        $options_data = json_decode($data['data'], true);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            wp_send_json_error('Dữ liệu options không hợp lệ');
+            return;
+        }
+
+        if (is_array($options_data)) {
+            $result = update_option($this->instance_name, json_encode($options_data));
+            if ($result) {
+                wp_send_json_success('Lưu options thành công');
+            } else {
+                wp_send_json_error('Không thể lưu options');
+            }
         } else {
             wp_send_json_error('Dữ liệu không hợp lệ');
         }
