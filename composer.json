@@ -16,6 +16,6 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "jankx/icon-picker": "dev-master"
+        "jankx/icon-picker": "^2.0"
     }
 }
