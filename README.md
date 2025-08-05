@@ -43,31 +43,56 @@ graph TD
     B --> C[Section]
     C --> D[Field]
 
-    subgraph "Field Types"
+    subgraph "Basic Fields"
         D --> E[TextField]
         D --> F[TextareaField]
         D --> G[SelectField]
-        D --> H[ImageField]
-        D --> I[IconField]
+        D --> H[CheckboxField]
+        D --> I[RadioField]
+    end
+
+    subgraph "Design Fields"
+        D --> J[ColorField]
+        D --> K[TypographyField]
+        D --> L[BackgroundField]
+        D --> M[SpacingField]
+    end
+
+    subgraph "Interactive Fields"
+        D --> N[SwitchField]
+        D --> O[SliderField]
+    end
+
+    subgraph "Media Fields"
+        D --> P[ImageField]
+        D --> Q[IconField]
     end
 
     subgraph "Factory Pattern"
-        J[FieldFactory] --> E
-        J --> F
-        J --> G
-        J --> H
-        J --> I
+        R[FieldFactory] --> E
+        R --> F
+        R --> G
+        R --> H
+        R --> I
+        R --> J
+        R --> K
+        R --> L
+        R --> M
+        R --> N
+        R --> O
+        R --> P
+        R --> Q
     end
 
     subgraph "Interfaces"
-        K[FieldInterface]
-        L[PageInterface]
-        M[SectionInterface]
+        S[FieldInterface]
+        T[PageInterface]
+        U[SectionInterface]
     end
 
-    D -.-> K
-    B -.-> L
-    C -.-> M
+    D -.-> S
+    B -.-> T
+    C -.-> U
 ```
 
 ### **3. Data Flow Architecture**
@@ -118,6 +143,22 @@ class FieldFactory
                 return new TextareaField($id, $title, $args);
             case 'select':
                 return new SelectField($id, $title, $args);
+            case 'checkbox':
+                return new CheckboxField($id, $title, $args);
+            case 'radio':
+                return new RadioField($id, $title, $args);
+            case 'color':
+                return new ColorField($id, $title, $args);
+            case 'typography':
+                return new TypographyField($id, $title, $args);
+            case 'background':
+                return new BackgroundField($id, $title, $args);
+            case 'spacing':
+                return new SpacingField($id, $title, $args);
+            case 'switch':
+                return new SwitchField($id, $title, $args);
+            case 'slider':
+                return new SliderField($id, $title, $args);
             case 'image':
                 return new ImageField($id, $title, $args);
             case 'icon':
@@ -136,6 +177,27 @@ Tất cả elements implement interfaces để đảm bảo consistency:
 - FieldInterface: getId(), getType(), getTitle(), getArgs()
 - PageInterface: getTitle()
 - SectionInterface: getTitle()
+
+// Field-specific Interfaces
+- TextFieldInterface, TextareaFieldInterface, SelectFieldInterface
+- CheckboxFieldInterface, RadioFieldInterface, ColorFieldInterface
+- TypographyFieldInterface, BackgroundFieldInterface, SpacingFieldInterface
+- SwitchFieldInterface, SliderFieldInterface, ImageFieldInterface, IconFieldInterface
+```
+
+### **4. ArrayAccess Support**
+
+Tất cả field classes implement ArrayAccess để truy cập properties như array:
+
+```php
+$field = new TextField('site_title', 'Site Title', []);
+echo $field['id'];        // 'site_title'
+echo $field['title'];     // 'Site Title'
+echo $field['type'];      // 'text'
+
+// Set properties
+$field['title'] = 'New Title';
+$field['args']['default'] = 'New Default';
 ```
 
 ## 📁 File Structure
@@ -151,6 +213,14 @@ dashboard-framework/
 │   │       ├── TextField.php
 │   │       ├── TextareaField.php
 │   │       ├── SelectField.php
+│   │       ├── CheckboxField.php
+│   │       ├── RadioField.php
+│   │       ├── ColorField.php
+│   │       ├── TypographyField.php
+│   │       ├── BackgroundField.php
+│   │       ├── SpacingField.php
+│   │       ├── SwitchField.php
+│   │       ├── SliderField.php
 │   │       ├── ImageField.php
 │   │       └── IconField.php
 │   ├── Factories/
@@ -163,9 +233,19 @@ dashboard-framework/
 │   │       ├── TextFieldInterface.php
 │   │       ├── TextareaFieldInterface.php
 │   │       ├── SelectFieldInterface.php
+│   │       ├── CheckboxFieldInterface.php
+│   │       ├── RadioFieldInterface.php
+│   │       ├── ColorFieldInterface.php
+│   │       ├── TypographyFieldInterface.php
+│   │       ├── BackgroundFieldInterface.php
+│   │       ├── SpacingFieldInterface.php
+│   │       ├── SwitchFieldInterface.php
+│   │       ├── SliderFieldInterface.php
 │   │       ├── ImageFieldInterface.php
 │   │       └── IconFieldInterface.php
 │   └── OptionFramework.php (Main framework)
+├── docs/
+│   └── FIELD_TYPES.md (Field types documentation)
 ├── dist/
 │   ├── bundle.js (React components)
 │   └── styles.css (UI styles)
@@ -207,7 +287,7 @@ class OptionFramework
 
 #### **A. Base Field Class**
 ```php
-abstract class Field implements FieldInterface, JsonSerializable
+abstract class Field implements FieldInterface, JsonSerializable, ArrayAccess
 {
     protected $id;
     protected $title;
@@ -230,12 +310,18 @@ abstract class Field implements FieldInterface, JsonSerializable
             'args' => $this->args,
         ];
     }
+
+    // ArrayAccess implementation
+    public function offsetGet($offset) { /* ... */ }
+    public function offsetSet($offset, $value) { /* ... */ }
+    public function offsetExists($offset) { /* ... */ }
+    public function offsetUnset($offset) { /* ... */ }
 }
 ```
 
 #### **B. Page Container**
 ```php
-class Page implements PageInterface, JsonSerializable
+class Page implements PageInterface, JsonSerializable, ArrayAccess
 {
     protected $title;
     protected $sections;
@@ -257,7 +343,7 @@ class Page implements PageInterface, JsonSerializable
 
 #### **C. Section Container**
 ```php
-class Section implements SectionInterface, JsonSerializable
+class Section implements SectionInterface, JsonSerializable, ArrayAccess
 {
     protected $title;
     protected $fields;
@@ -279,7 +365,9 @@ class Section implements SectionInterface, JsonSerializable
 
 ### **3. Field Types**
 
-#### **A. TextField**
+#### **A. Basic Fields**
+
+**TextField**
 ```php
 class TextField extends Field implements TextFieldInterface
 {
@@ -287,7 +375,7 @@ class TextField extends Field implements TextFieldInterface
 }
 ```
 
-#### **B. TextareaField**
+**TextareaField**
 ```php
 class TextareaField extends Field implements TextareaFieldInterface
 {
@@ -295,7 +383,7 @@ class TextareaField extends Field implements TextareaFieldInterface
 }
 ```
 
-#### **C. SelectField**
+**SelectField**
 ```php
 class SelectField extends Field implements SelectFieldInterface
 {
@@ -312,7 +400,204 @@ class SelectField extends Field implements SelectFieldInterface
 }
 ```
 
-#### **D. ImageField**
+**CheckboxField**
+```php
+class CheckboxField extends Field implements CheckboxFieldInterface
+{
+    protected $type = 'checkbox';
+
+    public function getDefaultValue()
+    {
+        return $this->args['default'] ?? false;
+    }
+
+    public function getDescription()
+    {
+        return $this->args['description'] ?? '';
+    }
+}
+```
+
+**RadioField**
+```php
+class RadioField extends Field implements RadioFieldInterface
+{
+    protected $type = 'radio';
+
+    public function getOptions()
+    {
+        return $this->args['options'] ?? [];
+    }
+
+    public function getDefaultValue()
+    {
+        return $this->args['default'] ?? '';
+    }
+
+    public function getLayout()
+    {
+        return $this->args['layout'] ?? 'horizontal';
+    }
+}
+```
+
+#### **B. Design Fields**
+
+**ColorField**
+```php
+class ColorField extends Field implements ColorFieldInterface
+{
+    protected $type = 'color';
+
+    public function getDefaultColor()
+    {
+        return $this->args['default'] ?? '#000000';
+    }
+
+    public function isTransparent()
+    {
+        return $this->args['transparent'] ?? false;
+    }
+
+    public function hasAlpha()
+    {
+        return $this->args['alpha'] ?? false;
+    }
+}
+```
+
+**TypographyField**
+```php
+class TypographyField extends Field implements TypographyFieldInterface
+{
+    protected $type = 'typography';
+
+    public function getTypographyOptions()
+    {
+        return [
+            'font-family' => $this->args['font-family'] ?? true,
+            'font-size' => $this->args['font-size'] ?? true,
+            'font-weight' => $this->args['font-weight'] ?? true,
+            'line-height' => $this->args['line-height'] ?? true,
+            'color' => $this->args['color'] ?? true,
+        ];
+    }
+
+    public function isGoogleFontsEnabled()
+    {
+        return $this->args['google'] ?? true;
+    }
+}
+```
+
+**BackgroundField**
+```php
+class BackgroundField extends Field implements BackgroundFieldInterface
+{
+    protected $type = 'background';
+
+    public function getBackgroundOptions()
+    {
+        return [
+            'background-color' => $this->args['background-color'] ?? true,
+            'background-image' => $this->args['background-image'] ?? true,
+            'background-repeat' => $this->args['background-repeat'] ?? true,
+            'background-position' => $this->args['background-position'] ?? true,
+            'background-size' => $this->args['background-size'] ?? true,
+        ];
+    }
+
+    public function isTransparentEnabled()
+    {
+        return $this->args['transparent'] ?? true;
+    }
+}
+```
+
+**SpacingField**
+```php
+class SpacingField extends Field implements SpacingFieldInterface
+{
+    protected $type = 'spacing';
+
+    public function getMode()
+    {
+        return $this->args['mode'] ?? 'margin';
+    }
+
+    public function getUnits()
+    {
+        return $this->args['units'] ?? ['px', 'em', '%'];
+    }
+
+    public function getSpacingOptions()
+    {
+        return [
+            'top' => $this->args['top'] ?? true,
+            'right' => $this->args['right'] ?? true,
+            'bottom' => $this->args['bottom'] ?? true,
+            'left' => $this->args['left'] ?? true,
+        ];
+    }
+}
+```
+
+#### **C. Interactive Fields**
+
+**SwitchField**
+```php
+class SwitchField extends Field implements SwitchFieldInterface
+{
+    protected $type = 'switch';
+
+    public function getDefaultValue()
+    {
+        return $this->args['default'] ?? false;
+    }
+
+    public function getOnText()
+    {
+        return $this->args['on'] ?? 'On';
+    }
+
+    public function getOffText()
+    {
+        return $this->args['off'] ?? 'Off';
+    }
+}
+```
+
+**SliderField**
+```php
+class SliderField extends Field implements SliderFieldInterface
+{
+    protected $type = 'slider';
+
+    public function getMin()
+    {
+        return $this->args['min'] ?? 0;
+    }
+
+    public function getMax()
+    {
+        return $this->args['max'] ?? 100;
+    }
+
+    public function getStep()
+    {
+        return $this->args['step'] ?? 1;
+    }
+
+    public function shouldDisplayValue()
+    {
+        return $this->args['display_value'] ?? true;
+    }
+}
+```
+
+#### **D. Media Fields**
+
+**ImageField**
 ```php
 class ImageField extends Field implements ImageFieldInterface
 {
@@ -320,7 +605,7 @@ class ImageField extends Field implements ImageFieldInterface
 }
 ```
 
-#### **E. IconField**
+**IconField**
 ```php
 class IconField extends Field implements IconFieldInterface
 {
@@ -375,7 +660,65 @@ $page->addSection($section);
 $framework->addPage($page);
 ```
 
-### **3. Built-in Options Registration**
+### **3. Advanced Field Examples**
+
+**Typography Configuration**
+```php
+$typographyField = FieldFactory::create('body_typography', 'Body Typography', 'typography', [
+    'font-family' => true,
+    'font-size' => true,
+    'font-weight' => true,
+    'line-height' => true,
+    'color' => true,
+    'google' => true,
+    'default' => [
+        'font-family' => 'Arial, sans-serif',
+        'font-size' => '16px',
+        'font-weight' => '400',
+        'line-height' => '1.6',
+        'color' => '#333333'
+    ]
+]);
+```
+
+**Background Configuration**
+```php
+$backgroundField = FieldFactory::create('header_background', 'Header Background', 'background', [
+    'background-color' => true,
+    'background-image' => true,
+    'background-repeat' => true,
+    'background-position' => true,
+    'background-size' => true,
+    'default' => [
+        'background-color' => '#ffffff',
+        'background-image' => '',
+        'background-repeat' => 'no-repeat',
+        'background-position' => 'center center',
+        'background-size' => 'cover'
+    ]
+]);
+```
+
+**Spacing Configuration**
+```php
+$spacingField = FieldFactory::create('content_padding', 'Content Padding', 'spacing', [
+    'mode' => 'padding',
+    'units' => ['px', 'em', '%'],
+    'top' => true,
+    'right' => true,
+    'bottom' => true,
+    'left' => true,
+    'default' => [
+        'top' => '20px',
+        'right' => '20px',
+        'bottom' => '20px',
+        'left' => '20px',
+        'units' => 'px'
+    ]
+]);
+```
+
+### **4. Built-in Options Registration**
 
 ```php
 // Register built-in options
@@ -391,6 +734,20 @@ OptionFramework::registerBuiltInOptions('my_theme_options', [
                         'title' => 'Site Title',
                         'type' => 'text',
                         'default_value' => 'My Website'
+                    ],
+                    [
+                        'id' => 'primary_color',
+                        'title' => 'Primary Color',
+                        'type' => 'color',
+                        'default' => '#007cba'
+                    ],
+                    [
+                        'id' => 'body_typography',
+                        'title' => 'Body Typography',
+                        'type' => 'typography',
+                        'font-family' => true,
+                        'font-size' => true,
+                        'color' => true
                     ]
                 ]
             ]
@@ -422,6 +779,14 @@ OptionFramework::registerBuiltInOptions('my_theme_options', [
 | `text` | Text input | Basic text input |
 | `textarea` | Multi-line text | Large text areas |
 | `select` | Dropdown select | Options list |
+| `checkbox` | Checkbox field | Boolean values |
+| `radio` | Radio buttons | Single selection |
+| `color` | Color picker | Color selection với alpha |
+| `typography` | Typography settings | Font family, size, weight, etc. |
+| `background` | Background settings | Color, image, position, etc. |
+| `spacing` | Spacing/dimensions | Margin, padding với units |
+| `switch` | Toggle switch | On/off states |
+| `slider` | Range slider | Numeric values với min/max |
 | `image` | Media upload | Image picker với preview |
 | `icon` | Icon picker | Icon search và selection |
 
@@ -529,6 +894,12 @@ $section->addField(FieldFactory::create('body_font', 'Body Font', 'select', [
 $section->addField(FieldFactory::create('heading_font', 'Heading Font', 'select', [
     'options' => ['Arial', 'Georgia', 'Times New Roman']
 ]));
+
+$section->addField(FieldFactory::create('body_typography', 'Body Typography', 'typography', [
+    'font-family' => true,
+    'font-size' => true,
+    'color' => true
+]));
 ```
 
 ### **3. Error Handling**
@@ -594,8 +965,29 @@ File Config → OptionsReader → ConfigRepository →
 Dashboard Framework Elements → React UI → WordPress Admin
 ```
 
+## 📊 Field Type Mapping với Redux
+
+Dashboard Framework hỗ trợ mapping với Redux Framework:
+
+| Dashboard Type | Redux Type | Description |
+|---------------|------------|-------------|
+| `text` | `text` | Basic text input |
+| `textarea` | `textarea` | Multi-line text |
+| `select` | `select` | Dropdown select |
+| `checkbox` | `checkbox` | Checkbox field |
+| `radio` | `radio` | Radio buttons |
+| `color` | `color` | Color picker |
+| `switch` | `switch` | Toggle switch |
+| `slider` | `slider` | Range slider |
+| `typography` | `typography` | Typography settings |
+| `background` | `background` | Background settings |
+| `spacing` | `spacing` | Spacing/dimensions |
+| `image` | `media` | Image upload |
+| `icon` | `icon_select` | Icon selector |
+
 ## 📚 Related Documentation
 
+- [Field Types Documentation](docs/FIELD_TYPES.md)
 - [Option Adapter Documentation](../option-adapter/docs/README.md)
 - [Jankx Framework Documentation](../../docs/README.md)
 - [Gutenberg Integration](../../docs/gutenberg/README.md)
