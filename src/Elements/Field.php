@@ -8,14 +8,14 @@ if (!defined('ABSPATH')) {
 
 use Jankx\Dashboard\Interfaces\FieldInterface;
 use JsonSerializable;
+use ArrayAccess;
 
-abstract class Field implements FieldInterface, JsonSerializable
+abstract class Field implements FieldInterface, JsonSerializable, ArrayAccess
 {
     protected $id;
     protected $title;
     protected $type;
     protected $args;
-
 
     public function __construct($id, $title, $args = [])
     {
@@ -52,5 +52,63 @@ abstract class Field implements FieldInterface, JsonSerializable
             'type' => $this->type,
             'args' => $this->args,
         ];
+    }
+
+    // ArrayAccess implementation
+    public function offsetExists($offset): bool
+    {
+        return in_array($offset, ['id', 'title', 'type', 'args']);
+    }
+
+    public function offsetGet($offset): mixed
+    {
+        switch ($offset) {
+            case 'id':
+                return $this->id;
+            case 'title':
+                return $this->title;
+            case 'type':
+                return $this->type;
+            case 'args':
+                return $this->args;
+            default:
+                return null;
+        }
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        switch ($offset) {
+            case 'id':
+                $this->id = $value;
+                break;
+            case 'title':
+                $this->title = $value;
+                break;
+            case 'type':
+                $this->type = $value;
+                break;
+            case 'args':
+                $this->args = $value;
+                break;
+        }
+    }
+
+    public function offsetUnset($offset): void
+    {
+        switch ($offset) {
+            case 'id':
+                $this->id = null;
+                break;
+            case 'title':
+                $this->title = null;
+                break;
+            case 'type':
+                $this->type = null;
+                break;
+            case 'args':
+                $this->args = [];
+                break;
+        }
     }
 }

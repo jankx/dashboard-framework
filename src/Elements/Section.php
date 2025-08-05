@@ -8,8 +8,9 @@ if (!defined('ABSPATH')) {
 
 use Jankx\Dashboard\Interfaces\SectionInterface;
 use JsonSerializable;
+use ArrayAccess;
 
-class Section implements SectionInterface, JsonSerializable
+class Section implements SectionInterface, JsonSerializable, ArrayAccess
 {
     protected $title;
     protected $fields;
@@ -41,5 +42,47 @@ class Section implements SectionInterface, JsonSerializable
             'title' => $this->title,
             'fields' => $this->fields,
         ];
+    }
+
+    // ArrayAccess implementation
+    public function offsetExists($offset): bool
+    {
+        return in_array($offset, ['title', 'fields']);
+    }
+
+    public function offsetGet($offset): mixed
+    {
+        switch ($offset) {
+            case 'title':
+                return $this->title;
+            case 'fields':
+                return $this->fields;
+            default:
+                return null;
+        }
+    }
+
+    public function offsetSet($offset, $value): void
+    {
+        switch ($offset) {
+            case 'title':
+                $this->title = $value;
+                break;
+            case 'fields':
+                $this->fields = $value;
+                break;
+        }
+    }
+
+    public function offsetUnset($offset): void
+    {
+        switch ($offset) {
+            case 'title':
+                $this->title = null;
+                break;
+            case 'fields':
+                $this->fields = [];
+                break;
+        }
     }
 }
