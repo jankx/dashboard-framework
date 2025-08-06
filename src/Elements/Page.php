@@ -17,10 +17,11 @@ class Page implements PageInterface, JsonSerializable, ArrayAccess
     protected $sections;
     protected $icon;
 
-    public function __construct($title, $sections = [])
+    public function __construct($title, $sections = [], $icon = '')
     {
         $this->title = $title;
         $this->sections = $sections;
+        $this->icon = $icon;
         $this->id = sanitize_title($title);
     }
 
@@ -56,7 +57,7 @@ class Page implements PageInterface, JsonSerializable, ArrayAccess
 
     public function getIcon()
     {
-        return '';
+        return $this->icon;
     }
 
     public function getSections()
