@@ -12,13 +12,16 @@ use ArrayAccess;
 
 class Page implements PageInterface, JsonSerializable, ArrayAccess
 {
+    protected $id;
     protected $title;
     protected $sections;
+    protected $icon;
 
     public function __construct($title, $sections = [])
     {
         $this->title = $title;
         $this->sections = $sections;
+        $this->id = sanitize_title($title);
     }
 
     public function addSection(Section $section)
@@ -26,9 +29,34 @@ class Page implements PageInterface, JsonSerializable, ArrayAccess
         $this->sections[] = $section;
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function getTitle()
     {
         return $this->title;
+    }
+
+    public function getSubtitle()
+    {
+        return '';
+    }
+
+    public function getDescription()
+    {
+        return '';
+    }
+
+    public function getPriority()
+    {
+        return 30;
+    }
+
+    public function getIcon()
+    {
+        return '';
     }
 
     public function getSections()

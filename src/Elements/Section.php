@@ -12,6 +12,7 @@ use ArrayAccess;
 
 class Section implements SectionInterface, JsonSerializable, ArrayAccess
 {
+    protected $id;
     protected $title;
     protected $fields;
 
@@ -19,6 +20,7 @@ class Section implements SectionInterface, JsonSerializable, ArrayAccess
     {
         $this->title = $title;
         $this->fields = $fields;
+        $this->id = sanitize_title($title);
     }
 
     public function addField(Field $field)
@@ -26,9 +28,29 @@ class Section implements SectionInterface, JsonSerializable, ArrayAccess
         $this->fields[] = $field;
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function getTitle()
     {
         return $this->title;
+    }
+
+    public function getSubtitle()
+    {
+        return '';
+    }
+
+    public function getDescription()
+    {
+        return '';
+    }
+
+    public function getPriority()
+    {
+        return 30;
     }
 
     public function getFields()
