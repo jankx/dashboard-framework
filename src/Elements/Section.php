@@ -7,13 +7,18 @@ if (!defined('ABSPATH')) {
 }
 
 use Jankx\Dashboard\Interfaces\SectionInterface;
+use Jankx\Adapter\Options\Interfaces\Section as OptionsSectionInterface;
 use JsonSerializable;
 use ArrayAccess;
 
-class Section implements SectionInterface, JsonSerializable, ArrayAccess
+class Section implements SectionInterface, OptionsSectionInterface, JsonSerializable, ArrayAccess
 {
     protected $id;
     protected $title;
+    protected $subtitle;
+    protected $description;
+    protected $priority;
+    protected $icon;
     protected $fields;
 
     public function __construct($title, $fields = [])
@@ -21,9 +26,13 @@ class Section implements SectionInterface, JsonSerializable, ArrayAccess
         $this->title = $title;
         $this->fields = $fields;
         $this->id = sanitize_title($title);
+        $this->subtitle = '';
+        $this->description = '';
+        $this->priority = 30;
+        $this->icon = '';
     }
 
-    public function addField(Field $field)
+    public function addField($field)
     {
         $this->fields[] = $field;
     }
@@ -40,17 +49,47 @@ class Section implements SectionInterface, JsonSerializable, ArrayAccess
 
     public function getSubtitle()
     {
-        return '';
+        return $this->subtitle;
     }
 
     public function getDescription()
     {
-        return '';
+        return $this->description;
     }
 
     public function getPriority()
     {
-        return 30;
+        return $this->priority;
+    }
+
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function setSubtitle($subtitle)
+    {
+        $this->subtitle = $subtitle;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
     }
 
     public function getFields()

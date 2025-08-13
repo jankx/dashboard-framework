@@ -7,13 +7,17 @@ if (!defined('ABSPATH')) {
 }
 
 use Jankx\Dashboard\Interfaces\PageInterface;
+use Jankx\Adapter\Options\Interfaces\Page as OptionsPageInterface;
 use JsonSerializable;
 use ArrayAccess;
 
-class Page implements PageInterface, JsonSerializable, ArrayAccess
+class Page implements PageInterface, OptionsPageInterface, JsonSerializable, ArrayAccess
 {
     protected $id;
     protected $title;
+    protected $subtitle;
+    protected $description;
+    protected $priority;
     protected $sections;
     protected $icon;
 
@@ -23,9 +27,12 @@ class Page implements PageInterface, JsonSerializable, ArrayAccess
         $this->sections = $sections;
         $this->icon = $icon;
         $this->id = sanitize_title($title);
+        $this->subtitle = '';
+        $this->description = '';
+        $this->priority = 30;
     }
 
-    public function addSection(Section $section)
+    public function addSection($section)
     {
         $this->sections[] = $section;
     }
@@ -42,22 +49,47 @@ class Page implements PageInterface, JsonSerializable, ArrayAccess
 
     public function getSubtitle()
     {
-        return '';
+        return $this->subtitle;
     }
 
     public function getDescription()
     {
-        return '';
+        return $this->description;
     }
 
     public function getPriority()
     {
-        return 30;
+        return $this->priority;
     }
 
     public function getIcon()
     {
         return $this->icon;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    public function setSubtitle($subtitle)
+    {
+        $this->subtitle = $subtitle;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+    }
+
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
     }
 
     public function getSections()

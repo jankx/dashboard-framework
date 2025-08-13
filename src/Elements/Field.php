@@ -7,10 +7,11 @@ if (!defined('ABSPATH')) {
 }
 
 use Jankx\Dashboard\Interfaces\FieldInterface;
+use Jankx\Adapter\Options\Interfaces\Field as OptionsFieldInterface;
 use JsonSerializable;
 use ArrayAccess;
 
-abstract class Field implements FieldInterface, JsonSerializable, ArrayAccess
+abstract class Field implements FieldInterface, OptionsFieldInterface, JsonSerializable, ArrayAccess
 {
     protected $id;
     protected $title;
@@ -52,6 +53,16 @@ abstract class Field implements FieldInterface, JsonSerializable, ArrayAccess
     public function getDefault()
     {
         return $this->args['default'] ?? '';
+    }
+
+    public function getPriority()
+    {
+        return $this->args['priority'] ?? 30;
+    }
+
+    public function getIcon()
+    {
+        return $this->args['icon'] ?? '';
     }
 
     public function hasOptions()
