@@ -173,6 +173,15 @@ class OptionFramework
 
         // Kiểm tra xem người dùng có đang ở trên trang tùy chọn của instance không
         if (str_contains($screen->id, "{$this->instance_name}-options")) {
+            // Enqueue Google Fonts
+            wp_enqueue_style('jankx-options-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap', [], null);
+            
+            // Enqueue Coloris CSS
+            wp_enqueue_style('coloris-css', 'https://cdn.jsdelivr.net/npm/@momo-cow/coloris@0.24.0/dist/coloris.min.css', [], '0.24.0');
+            
+            // Enqueue Air Datepicker CSS
+            wp_enqueue_style('air-datepicker-css', 'https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.min.css', [], '3.5.3');
+            
             // Tải script và CSS chỉ khi ở trên trang tùy chọn
             wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.40', ['wp-element'], null, true);
             wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/styles.css?v=1.0.0.26'); // Thêm CSS nếu cần
