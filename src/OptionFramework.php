@@ -16,6 +16,8 @@ class OptionFramework
     private $config;
     public $pages = [];
     private static $built_in_options = [];
+    private $menu_slug = null;
+    private $auto_register_menu = true; // Flag để bật/tắt việc tự động đăng ký menu
 
     public function __construct($instance_name)
     {
@@ -26,7 +28,9 @@ class OptionFramework
             $this->pages = array_merge($this->pages, self::$built_in_options[$instance_name]);
         }
 
-        add_action('admin_menu', [$this, 'addOptionsPage']);
+        if ($this->auto_register_menu) {
+            add_action('admin_menu', [$this, 'addOptionsPage']);
+        }
         add_action('admin_enqueue_scripts', [$this, 'enqueueScripts']);
         add_action('wp_ajax_save_options', [$this, 'saveOptions']);
         add_action('wp_ajax_fetch_options', [$this, 'fetchOptions']);
@@ -61,9 +65,57 @@ class OptionFramework
             'menu_position' => null,
             'menu_icon' => '',
             'capability' => 'manage_options',
-            'menu_type' => 'add_theme_menu'
+            'menu_type' => 'add_theme_menu',
+            'menu_slug' => null, // Nếu set, sẽ sử dụng slug này thay vì {$instance_name}-options
+            'auto_register_menu' => true // Bật/tắt việc tự động đăng ký menu
         ]);
 
+        // Lưu menu_slug nếu được set trong config
+        if (isset($config['menu_slug']) && !empty($config['menu_slug'])) {
+            $this->menu_slug = $config['menu_slug'];
+        }
+
+        // Tắt auto register menu nếu được chỉ định trong config
+        if (isset($config['auto_register_menu']) && $config['auto_register_menu'] === false) {
+            $this->auto_register_menu = false;
+            // Remove hook nếu đã được thêm
+            remove_action('admin_menu', [$this, 'addOptionsPage']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set custom menu slug
+     *
+     * @param string $menu_slug
+     * @return $this
+     */
+    public function setMenuSlug($menu_slug)
+    {
+        $this->menu_slug = $menu_slug;
+        return $this;
+    }
+
+    /**
+     * Get menu slug
+     *
+     * @return string
+     */
+    public function getMenuSlug()
+    {
+        return $this->menu_slug ?: "{$this->instance_name}-options";
+    }
+
+    /**
+     * Tắt/bật việc tự động đăng ký menu
+     *
+     * @param bool $auto_register
+     * @return $this
+     */
+    public function setAutoRegisterMenu($auto_register)
+    {
+        $this->auto_register_menu = $auto_register;
         return $this;
     }
 
@@ -100,11 +152,12 @@ class OptionFramework
 
     public function addOptionsPage()
     {
+        $menu_slug = $this->getMenuSlug();
         add_menu_page(
             $this->page_title,
             $this->menu_text,
             $this->config['capability'],
-            "{$this->instance_name}-options",
+            $menu_slug,
             [$this, 'renderOptionsPage'],
             $this->config['menu_icon'],
             $this->config['menu_position']
@@ -172,7 +225,9 @@ class OptionFramework
         $screen = get_current_screen();
 
         // Kiểm tra xem người dùng có đang ở trên trang tùy chọn của instance không
-        if (str_contains($screen->id, "{$this->instance_name}-options")) {
+        $menu_slug = $this->getMenuSlug();
+        $check_slug = $this->menu_slug ? $menu_slug : "{$this->instance_name}-options";
+        if (str_contains($screen->id, $check_slug)) {
             // Enqueue Google Fonts
             wp_enqueue_style('jankx-options-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap', [], null);
             
