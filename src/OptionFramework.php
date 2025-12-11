@@ -193,10 +193,81 @@ class OptionFramework
         return $user;
     }
 
+    // Transform Page objects to array format
+    private function transformPagesToArray($pages) {
+        $result = [];
+        foreach ($pages as $key => $page) {
+            if ($page instanceof Page) {
+                $pageId = $page->getId() ?: $key;
+                $sections = [];
+                foreach ($page->getSections() as $section) {
+                    $sectionId = $section->getId() ?: sanitize_title($section->getTitle());
+                    $fields = [];
+                    foreach ($section->getFields() as $field) {
+                        $fieldId = $field->getId() ?: '';
+                        $fieldType = $field->getType() ?: 'text';
+                        $fieldTitle = $field->getTitle() ?: '';
+                        $fieldArgs = $field->getArgs() ?: [];
+                        
+                        $fieldData = [
+                            'id' => $fieldId,
+                            'type' => $fieldType,
+                            'title' => $fieldTitle,
+                        ];
+                        
+                        // Add args properties
+                        if (isset($fieldArgs['subtitle'])) {
+                            $fieldData['subtitle'] = $fieldArgs['subtitle'];
+                        }
+                        if (isset($fieldArgs['default']) || isset($fieldArgs['default_value'])) {
+                            $fieldData['default'] = $fieldArgs['default'] ?? $fieldArgs['default_value'] ?? null;
+                        }
+                        if (isset($fieldArgs['options'])) {
+                            $fieldData['options'] = $fieldArgs['options'];
+                        }
+                        if (isset($fieldArgs['placeholder'])) {
+                            $fieldData['placeholder'] = $fieldArgs['placeholder'];
+                        }
+                        if (isset($fieldArgs['min'])) {
+                            $fieldData['min'] = $fieldArgs['min'];
+                        }
+                        if (isset($fieldArgs['max'])) {
+                            $fieldData['max'] = $fieldArgs['max'];
+                        }
+                        if (isset($fieldArgs['step'])) {
+                            $fieldData['step'] = $fieldArgs['step'];
+                        }
+                        if (isset($fieldArgs['unit'])) {
+                            $fieldData['unit'] = $fieldArgs['unit'];
+                        }
+                        
+                        $fields[] = $fieldData;
+                    }
+                    $sections[$sectionId] = [
+                        'id' => $sectionId,
+                        'title' => $section->getTitle(),
+                        'fields' => $fields,
+                    ];
+                }
+                $result[$pageId] = [
+                    'id' => $pageId,
+                    'title' => $page->getTitle(),
+                    'icon' => $page->getIcon(),
+                    'sections' => $sections,
+                ];
+            } else {
+                // Already array format
+                $result[$key] = $page;
+            }
+        }
+        return $result;
+    }
+
     // Lấy options đã merge để truyền sang JS
     public function getMergedPages() {
         $built_in = self::$built_in_options[$this->instance_name] ?? [];
-        return $this->mergeOptions($built_in, $this->pages);
+        $transformed_pages = $this->transformPagesToArray($this->pages);
+        return $this->mergeOptions($built_in, $transformed_pages);
     }
 
     public function renderOptionsPage()
@@ -228,48 +299,20 @@ class OptionFramework
         $menu_slug = $this->getMenuSlug();
         $check_slug = $this->menu_slug ? $menu_slug : "{$this->instance_name}-options";
         if (str_contains($screen->id, $check_slug)) {
-            // Enqueue Google Fonts
+            // Enqueue Google Fonts (optional, can be bundled too if needed)
             wp_enqueue_style('jankx-options-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap', [], null);
             
-            // Enqueue Coloris CSS
-            wp_enqueue_style('coloris-css', 'https://cdn.jsdelivr.net/npm/@momo-cow/coloris@0.24.0/dist/coloris.min.css', [], '0.24.0');
-            
-            // Enqueue Air Datepicker CSS
-            wp_enqueue_style('air-datepicker-css', 'https://cdn.jsdelivr.net/npm/air-datepicker@3.5.3/air-datepicker.min.css', [], '3.5.3');
-            
+            // Coloris and Air Datepicker CSS are now bundled in styles.css (no CDN needed)
             // Tải script và CSS chỉ khi ở trên trang tùy chọn
+            // All dependencies (coloris, air-datepicker) are bundled in bundle.js and styles.css
             wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.40', ['wp-element'], null, true);
-            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/styles.css?v=1.0.0.26'); // Thêm CSS nếu cần
+            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/styles.css?v=1.0.0.26');
 
             // Add WordPress Media Uploader
             wp_enqueue_media();
 
-            // Add Icon Picker from Codeinwp
-            wp_enqueue_style('dashicons');
-            wp_enqueue_script(
-                'icon-picker',
-                '/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/vendor/jankx/icon-picker/js/icon-picker.js',
-                ['jquery'],
-                '1.0.0',
-                true
-            );
-            wp_enqueue_style(
-                'icon-picker',
-                '/wp-content/themes/xanhvina/vendor/jankx/dashboard-framework/vendor/jankx/icon-picker/css/icon-picker.css'
-            );
-
-            // Localize icon picker data
-            wp_localize_script('icon-picker', 'iconPickerIcons', [
-                'dashicons' => [
-                    'name' => 'Dashicons',
-                    'icons' => [
-                        'dashicons-menu',
-                        'dashicons-admin-site',
-                        // ... thêm các icon khác
-                    ]
-                ],
-                // Thêm các bộ icon khác nếu cần
-            ]);
+            // Icon Picker - TODO: Implement React-based icon picker component
+            // wp_enqueue_style('dashicons');
         }
     }
 

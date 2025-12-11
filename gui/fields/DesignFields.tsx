@@ -1,22 +1,28 @@
 import React, { useEffect } from 'react';
 import { FieldProps } from '../types';
 import { Upload, Italic, Type } from 'lucide-react';
+// Import coloris directly (bundled, no CDN)
+import Coloris from '@melloware/coloris';
 
 export const FieldColor: React.FC<FieldProps> = ({ value, onChange }) => {
     useEffect(() => {
-        const loadColoris = async () => {
-            try {
-                // @ts-ignore
-                const mod = await import('coloris');
-                const C = (mod.default || mod) as any;
-                if (C && typeof C.init === 'function') {
-                    C.init();
-                    C({ el: '.coloris', theme: 'polaroid', themeMode: 'light', format: 'hex', formatToggle: true });
-                }
-            } catch (e) { console.warn(e); }
-        };
-        loadColoris();
+        // Initialize coloris (bundled, no async needed)
+        try {
+            if (Coloris && typeof Coloris.init === 'function') {
+                Coloris.init();
+                Coloris({ el: '.coloris', theme: 'polaroid', themeMode: 'light', format: 'hex', formatToggle: true });
+            }
+        } catch (e) { 
+            console.warn('Coloris initialization error:', e); 
+        }
     }, []);
+
+    return (
+        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+            <input type="text" className="jankx-input coloris" style={{width: '120px'}} value={value || ''} onChange={(e) => onChange(e.target.value)} data-coloris />
+            <div style={{width: '36px', height: '36px', borderRadius: '4px', border: '1px solid #ccc', background: value || '#fff'}}></div>
+        </div>
+    );
 
     return (
         <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>

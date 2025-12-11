@@ -44,6 +44,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    position: relative;
 }
 
 .jankx-header {
@@ -54,7 +55,7 @@ body {
     justify-content: space-between;
     padding: 0 20px;
     border-bottom: 1px solid var(--jankx-border);
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -80,7 +81,8 @@ body {
 .jankx-main-layout {
     display: flex;
     padding-top: 60px;
-    min-height: 100vh;
+    min-height: calc(100vh - 60px);
+    position: relative;
 }
 
 /* --- Sidebar --- */
@@ -91,9 +93,10 @@ body {
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
-    position: fixed;
-    bottom: 0;
+    position: absolute;
     top: 60px;
+    bottom: 0;
+    left: 0;
     overflow-y: auto;
     transition: transform 0.3s ease;
     z-index: 90;
@@ -132,6 +135,7 @@ body {
     margin-left: 260px; /* Width of sidebar */
     padding: 20px 40px;
     width: calc(100% - 260px);
+    position: relative;
 }
 
 .jankx-panel {

@@ -7,7 +7,7 @@ import {
   Send, MessageCircle, Facebook, Twitter, Instagram, Linkedin, 
   Youtube, Github 
 } from 'lucide-react';
-import { ReduxFieldRenderer } from '../ReduxFields';
+import { ReduxFieldRenderer } from './ReduxFields';
 
 // --- ICON LIBRARY ---
 const ICON_LIBRARY: Record<string, any> = {

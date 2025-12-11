@@ -8,11 +8,11 @@ export default class TextField extends Field {
         return (
             <Input
                 key={this.id}
-                label={this.field.title}
+                placeholder={this.field.title || this.field.name || ''}
                 value={value}
                 onChange={(e) => this.onChange(this.id, e.target.value)}
-                fullWidth
-                margin="normal"
+                width="100%"
+                mb={3}
             />
         );
     }

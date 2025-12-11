@@ -4,6 +4,10 @@
    import { Provider } from 'react-redux';
    import store from './store'; // Import store
    import OptionFrameworkApp from './components/OptionFrameworkApp';
+   
+   // Import CSS from node_modules (bundled, no CDN)
+   import '@melloware/coloris/dist/coloris.css';
+   import 'air-datepicker/air-datepicker.css';
 
    // Sử dụng dữ liệu từ PHP
    const optionsData = window.optionsData || {};

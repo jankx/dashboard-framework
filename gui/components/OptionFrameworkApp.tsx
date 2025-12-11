@@ -78,7 +78,9 @@ class OptionFrameworkApp extends Component<OptionFrameworkAppProps, OptionFramew
 
     handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        this.props.saveOptions(this.state.formData);
+        const dataToSave = this.state.formData || {};
+        console.log('Saving options:', dataToSave);
+        this.props.saveOptions(dataToSave);
     };
 
     handleToggleSection = (sectionId: string) => {
