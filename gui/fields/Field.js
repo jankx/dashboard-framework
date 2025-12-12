@@ -6,6 +6,9 @@ export default class Field {
     }
 
     getValue(formData) {
+        if (!formData || typeof formData !== 'object') {
+            return '';
+        }
         return formData[this.id] || '';
     }
 

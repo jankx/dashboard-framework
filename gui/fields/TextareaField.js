@@ -8,9 +8,11 @@ export default class TextareaField extends Field {
         return (
             <Textarea
                 key={this.id}
-                placeholder={this.field.title}
+                placeholder={this.field.title || this.field.name || ''}
                 value={value}
-                onChange={this.handleChange}
+                onChange={(e) => this.onChange(this.id, e.target.value)}
+                width="100%"
+                mb={3}
             />
         );
     }

@@ -29,7 +29,7 @@ class OptionFrameworkApp extends Component {
             currentPage: initialPage,
             defaultPage: Object.keys(props.optionsData)[0],
             openSections: {},
-            formData: props.formData
+            formData: props.formData || {}
         };
     }
 
@@ -64,7 +64,8 @@ class OptionFrameworkApp extends Component {
 
     renderField = (fieldId, field) => {
         const fieldInstance = FieldFactory.create(fieldId, field, this.handleChange);
-        return fieldInstance ? fieldInstance.render(this.state.formData) : null;
+        const formData = this.state.formData || {};
+        return fieldInstance ? fieldInstance.render(formData) : null;
     };
 
     handleToggleSection = (sectionId) => {
