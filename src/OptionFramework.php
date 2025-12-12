@@ -318,12 +318,6 @@ class OptionFramework
 
     public function saveOptions()
     {
-        // Include security helper if not already included
-        if (!class_exists('Jankx_Security_Helper')) {
-            require_once get_template_directory() . '/includes/security.php';
-        }
-
-        // Verify nonce using security helper
         if (!Jankx_Security_Helper::verify_nonce('nonce', 'save_options_nonce')) {
             wp_send_json_error('Nonce không hợp lệ');
             return;
