@@ -362,7 +362,18 @@ class OptionFramework
     public function fetchOptions()
     {
         $options = get_option($this->instance_name);
-        wp_send_json_success(json_decode($options));
+        if (is_array($options)) {
+            wp_send_json_success($options);
+            return;
+        }
+        if (is_string($options) && $options !== '') {
+            $decoded = json_decode($options, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                wp_send_json_success($decoded);
+                return;
+            }
+        }
+        wp_send_json_success([]);
     }
 
     // Phương thức để thêm page
