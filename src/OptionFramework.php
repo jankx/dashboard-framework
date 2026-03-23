@@ -194,7 +194,7 @@ class OptionFramework
     }
 
     // Transform Page objects to array format
-    private function transformPagesToArray($pages) {
+    private function transformPagesToArray($pages, $for_js = false) {
         $result = [];
         foreach ($pages as $key => $page) {
             if ($page instanceof Page) {
@@ -216,8 +216,8 @@ class OptionFramework
                         ];
                         
                         // Add args properties
-                        if (isset($fieldArgs['subtitle'])) {
-                            $fieldData['subtitle'] = $fieldArgs['subtitle'];
+                        if (isset($fieldArgs['subtitle']) || isset($fieldArgs['sub_title'])) {
+                            $fieldData['subtitle'] = $fieldArgs['subtitle'] ?? $fieldArgs['sub_title'];
                         }
                         if (isset($fieldArgs['default']) || isset($fieldArgs['default_value'])) {
                             $fieldData['default'] = $fieldArgs['default'] ?? $fieldArgs['default_value'] ?? null;
@@ -239,6 +239,33 @@ class OptionFramework
                         }
                         if (isset($fieldArgs['unit'])) {
                             $fieldData['unit'] = $fieldArgs['unit'];
+                        }
+                        if (isset($fieldArgs['width'])) {
+                            $fieldData['width'] = $fieldArgs['width'];
+                        }
+                        if (isset($fieldArgs['height'])) {
+                            $fieldData['height'] = $fieldArgs['height'];
+                        }
+                        if (isset($fieldArgs['option_name'])) {
+                            $fieldData['option_name'] = $fieldArgs['option_name'];
+                        }
+                        if (isset($fieldArgs['writer'])) {
+                           if ($for_js) {
+                               if (is_string($fieldArgs['writer'])) {
+                                   $fieldData['writer'] = $fieldArgs['writer'];
+                               }
+                           } else {
+                               $fieldData['writer'] = $fieldArgs['writer'];
+                           }
+                        }
+                        if (isset($fieldArgs['getter'])) {
+                           if ($for_js) {
+                               if (is_string($fieldArgs['getter'])) {
+                                   $fieldData['getter'] = $fieldArgs['getter'];
+                               }
+                           } else {
+                               $fieldData['getter'] = $fieldArgs['getter'];
+                           }
                         }
                         
                         $fields[] = $fieldData;
@@ -264,9 +291,9 @@ class OptionFramework
     }
 
     // Lấy options đã merge để truyền sang JS
-    public function getMergedPages() {
+    public function getMergedPages($for_js = false) {
         $built_in = self::$built_in_options[$this->instance_name] ?? [];
-        $transformed_pages = $this->transformPagesToArray($this->pages);
+        $transformed_pages = $this->transformPagesToArray($this->pages, $for_js);
         return $this->mergeOptions($built_in, $transformed_pages);
     }
 
@@ -275,7 +302,7 @@ class OptionFramework
         $nonce = wp_create_nonce('save_options_nonce');
 
         // Truyền dữ liệu sang JavaScript
-        wp_localize_script('react-app', 'optionsData', $this->getMergedPages());
+        wp_localize_script('react-app', 'optionsData', $this->getMergedPages(true));
         wp_localize_script('react-app', 'frameworkConfig', $this->config);
         wp_localize_script('react-app', 'jankxOptionAjax', [
             'ajaxurl' => admin_url('admin-ajax.php'),
@@ -349,13 +376,36 @@ class OptionFramework
         }
 
         if (is_array($options_data)) {
-            // Get existing options to compare
+            // Get all registered fields to check for custom writers/option names
+            $mapped_pages = $this->getMergedPages();
+            
+            // Handle independent field saving
+            foreach ($mapped_pages as $page) {
+                foreach ($page['sections'] as $section) {
+                    foreach ($section['fields'] as $field) {
+                        $field_id = $field['id'];
+                        if (isset($options_data[$field_id])) {
+                            $value = $options_data[$field_id];
+                            
+                            // Custom writer? (function name in config)
+                            if (isset($field['writer']) && is_callable($field['writer'])) {
+                                call_user_func($field['writer'], $value, $field_id);
+                            }
+                            // Individual option name?
+                            elseif (isset($field['option_name']) && !empty($field['option_name'])) {
+                                update_option($field['option_name'], $value);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Get existing options to compare for the main group
             $existing_options = get_option($this->instance_name);
             $new_options_json = json_encode($options_data);
 
-            // update_option returns false if value is the same, so we check if it changed
             if ($existing_options === $new_options_json) {
-                wp_send_json_success('Không có thay đổi nào để lưu');
+                wp_send_json_success('Lưu options thành công'); // Send success if no changes to main blob but might have saved others
                 return;
             }
 
@@ -372,19 +422,43 @@ class OptionFramework
 
     public function fetchOptions()
     {
-        $options = get_option($this->instance_name);
-        if (is_array($options)) {
-            wp_send_json_success($options);
-            return;
+        $options_json = get_option($this->instance_name);
+        $options_data = [];
+
+        if (is_string($options_json) && $options_json !== '') {
+            $options_data = json_decode($options_json, true) ?: [];
+        } elseif (is_array($options_json)) {
+            $options_data = $options_json;
         }
-        if (is_string($options) && $options !== '') {
-            $decoded = json_decode($options, true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                wp_send_json_success($decoded);
-                return;
+
+        // Aggregate with custom getters and individual option names
+        $mapped_pages = $this->getMergedPages();
+        foreach ($mapped_pages as $page) {
+            foreach ($page['sections'] as $section) {
+                foreach ($section['fields'] as $field) {
+                    $field_id = $field['id'];
+                    $custom_value = null;
+                    $has_custom = false;
+
+                    // Custom getter?
+                    if (isset($field['getter']) && is_callable($field['getter'])) {
+                        $custom_value = call_user_func($field['getter'], $field_id);
+                        $has_custom = true;
+                    }
+                    // Individual option name?
+                    elseif (isset($field['option_name']) && !empty($field['option_name'])) {
+                        $custom_value = get_option($field['option_name'], $field['default'] ?? null);
+                        $has_custom = true;
+                    }
+
+                    if ($has_custom) {
+                        $options_data[$field_id] = $custom_value;
+                    }
+                }
             }
         }
-        wp_send_json_success([]);
+
+        wp_send_json_success($options_data);
     }
 
     // Phương thức để thêm page

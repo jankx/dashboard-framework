@@ -3,7 +3,7 @@
     --jankx-primary: #0073aa;
     --jankx-primary-hover: #005177;
     --jankx-accent: #2271b1;
-    
+
     /* Status Colors */
     --jankx-success: #46b450;
     --jankx-warning: #ffb900;
@@ -19,7 +19,7 @@
     --jankx-border: #c3c4c7;
     --jankx-text: #3c434a;
     --jankx-text-muted: #646970;
-    
+
     /* Inputs */
     --jankx-input-bg: #ffffff;
     --jankx-input-border: #8c8f94;
@@ -132,7 +132,8 @@ body {
 /* --- Content Area --- */
 .jankx-content {
     flex: 1;
-    margin-left: 260px; /* Width of sidebar */
+    margin-left: 260px;
+    /* Width of sidebar */
     padding: 20px 40px;
     width: calc(100% - 260px);
     position: relative;
@@ -142,7 +143,7 @@ body {
     background: var(--jankx-white);
     border: 1px solid var(--jankx-border);
     border-radius: 4px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .jankx-panel-header {
@@ -208,10 +209,14 @@ input[type="date"],
 textarea,
 select {
     width: 100%;
-    max-width: 100%; /* Controlled by container usually */
-    padding: 0 12px; /* Height controlled by line-height/height, padding for horizontal */
-    height: 36px; /* Explicit height for single line inputs */
-    line-height: 34px; /* Vertical align text */
+    max-width: 100%;
+    /* Controlled by container usually */
+    padding: 0 12px;
+    /* Height controlled by line-height/height, padding for horizontal */
+    height: 36px;
+    /* Explicit height for single line inputs */
+    line-height: 34px;
+    /* Vertical align text */
     border: 1px solid var(--jankx-input-border);
     border-radius: 4px;
     font-size: 14px;
@@ -219,21 +224,24 @@ select {
     background-color: var(--jankx-input-bg) !important;
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     box-sizing: border-box;
-    appearance: none; /* Reset native appearance */
+    appearance: none;
+    /* Reset native appearance */
 }
 
 /* Add arrow for select */
 select {
-     background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E");
-     background-repeat: no-repeat;
-     background-position: right 8px center;
-     padding-right: 30px;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 30px;
 }
 
 textarea {
-    height: auto; /* Allow multiline */
+    height: auto;
+    /* Allow multiline */
     min-height: 100px;
-    padding: 8px 12px; /* Restore padding for textarea */
+    padding: 8px 12px;
+    /* Restore padding for textarea */
     line-height: 1.5;
     resize: vertical;
 }
@@ -278,7 +286,8 @@ input[type="radio"] {
     align-items: center;
     justify-content: center;
     gap: 5px;
-    height: 36px; /* Match input height */
+    height: 36px;
+    /* Match input height */
 }
 
 .jankx-btn:hover {
@@ -377,37 +386,61 @@ input[type="radio"] {
 }
 
 /* Helpers */
-.flex { display: flex; }
-.items-center { align-items: center; }
-.gap-2 { gap: 8px; }
-.gap-4 { gap: 16px; }
-.mb-2 { margin-bottom: 8px; }
-.w-full { width: 100%; }
+.flex {
+    display: flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.gap-2 {
+    gap: 8px;
+}
+
+.gap-4 {
+    gap: 16px;
+}
+
+.mb-2 {
+    margin-bottom: 8px;
+}
+
+.w-full {
+    width: 100%;
+}
 
 /* Responsive */
 @media (max-width: 768px) {
     .jankx-sidebar {
         transform: translateX(-100%);
     }
+
     .jankx-sidebar.open {
         transform: translateX(0);
     }
+
     .jankx-content {
         margin-left: 0;
         width: 100%;
         padding: 15px;
     }
+
     .jankx-field-row {
         flex-direction: column;
         gap: 10px;
     }
+
     .jankx-label-col {
         width: 100%;
     }
 }
 
 /* Overrides for Libs */
-#clr-picker .clr-color { color: transparent !important; }
+#clr-picker .clr-color {
+    color: transparent !important;
+}
+
 .air-datepicker {
     --adp-accent-color: var(--jankx-primary);
 }
@@ -485,6 +518,7 @@ input[type="radio"] {
     /* ── SVG Preview area ────────── */
     &__preview {
         width: 100%;
+        height: var(--jankx-svg-chooser-height, 70px);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -495,7 +529,7 @@ input[type="radio"] {
         img {
             display: block;
             width: 100%;
-            max-height: 70px;
+            height: 100%;
             object-fit: contain;
             transition: color 0.18s ease;
         }
@@ -507,8 +541,7 @@ input[type="radio"] {
 
             svg {
                 width: 100%;
-                max-height: 70px;
-                height: auto;
+                height: 100%;
             }
         }
 
