@@ -10,6 +10,7 @@ import { FieldRepeater, FieldSocialProfiles, FieldSortable } from './ExtensionFi
 import { FieldEditor, FieldAceEditor } from './EditorFields';
 import { FieldSection, FieldDivide, FieldInfo, FieldRaw } from './LayoutFields';
 import { FieldSeoComposite } from './SpecialFields';
+import { FieldSvgChooser } from './SvgChooserField';
 
 // ==========================================
 // MAIN RENDERER
@@ -26,15 +27,15 @@ export const ReduxFieldRenderer: React.FC<FieldProps> = (props) => {
 
   // Special Full Width Fields
   if (field.type === 'repeater' || field.type === 'seo_composite') {
-      return (
-          <div className="jankx-field-row" style={{display: 'block'}}>
-              <div style={{marginBottom: '10px'}}>
-                  <span className="jankx-label-title">{field.title}</span>
-                  {field.subtitle && <span className="jankx-label-desc">{field.subtitle}</span>}
-              </div>
-              {field.type === 'repeater' ? <FieldRepeater {...props} /> : <FieldSeoComposite {...props} />}
-          </div>
-      )
+    return (
+      <div className="jankx-field-row" style={{ display: 'block' }}>
+        <div style={{ marginBottom: '10px' }}>
+          <span className="jankx-label-title">{field.title}</span>
+          {field.subtitle && <span className="jankx-label-desc">{field.subtitle}</span>}
+        </div>
+        {field.type === 'repeater' ? <FieldRepeater {...props} /> : <FieldSeoComposite {...props} />}
+      </div>
+    )
   }
 
   // Standard Row Layout
@@ -45,39 +46,43 @@ export const ReduxFieldRenderer: React.FC<FieldProps> = (props) => {
         {field.subtitle && <p className="jankx-label-desc">{field.subtitle}</p>}
       </div>
       <div className="jankx-input-col">
-          {(() => {
-            switch (field.type) {
-              case 'text':
-              case 'number':
-              case 'password': return <FieldInput {...props} type={field.type} />;
-              case 'date': return <FieldDate {...props} />;
-              case 'textarea': return <FieldTextarea {...props} />;
-              case 'multi_text': return <FieldMultiText {...props} />;
-              case 'switch': return <FieldSwitch {...props} />;
-              case 'select': return <FieldSelect {...props} />;
-              case 'checkbox': return <FieldCheckbox {...props} />;
-              case 'radio': return <FieldRadio {...props} />;
-              case 'button_set': return <FieldButtonSet {...props} />;
-              case 'slider': return <FieldSlider {...props} />;
-              
-              case 'color': return <FieldColor {...props} />;
-              case 'typography': return <FieldTypography {...props} />;
-              case 'background': return <FieldBackground {...props} />;
-              case 'spacing': return <FieldSpacing {...props} />;
-              case 'dimensions': return <FieldDimensions {...props} />;
-              
-              case 'media': return <FieldMedia {...props} />;
-              case 'gallery': return <FieldGallery {...props} />;
-              
-              case 'social_profiles': return <FieldSocialProfiles {...props} />;
-              case 'sortable': return <FieldSortable {...props} />;
-              
-              case 'editor': return <FieldEditor {...props} />;
-              case 'ace_editor': return <FieldAceEditor {...props} />;
+        {(() => {
+          switch (field.type) {
+            case 'text':
+            case 'number':
+            case 'password': return <FieldInput {...props} type={field.type} />;
+            case 'date': return <FieldDate {...props} />;
+            case 'textarea': return <FieldTextarea {...props} />;
+            case 'multi_text': return <FieldMultiText {...props} />;
+            case 'switch': return <FieldSwitch {...props} />;
+            case 'select': return <FieldSelect {...props} />;
+            case 'checkbox': return <FieldCheckbox {...props} />;
+            case 'radio': return <FieldRadio {...props} />;
+            case 'button_set': return <FieldButtonSet {...props} />;
+            case 'slider': return <FieldSlider {...props} />;
 
-              default: return <div style={{color: 'red'}}>Field {field.type} not implemented</div>;
-            }
-          })()}
+            case 'color': return <FieldColor {...props} />;
+            case 'typography': return <FieldTypography {...props} />;
+            case 'background': return <FieldBackground {...props} />;
+            case 'spacing': return <FieldSpacing {...props} />;
+            case 'dimensions': return <FieldDimensions {...props} />;
+
+            case 'media': return <FieldMedia {...props} />;
+            case 'gallery': return <FieldGallery {...props} />;
+
+            case 'social_profiles': return <FieldSocialProfiles {...props} />;
+            case 'sortable': return <FieldSortable {...props} />;
+
+            case 'editor': return <FieldEditor {...props} />;
+            case 'ace_editor': return <FieldAceEditor {...props} />;
+
+            case 'svg_chooser':
+            case 'preset_chooser':
+            case 'layout_chooser': return <FieldSvgChooser {...props} />;
+
+            default: return <div style={{ color: 'red' }}>Field {field.type} not implemented</div>;
+          }
+        })()}
       </div>
     </div>
   );

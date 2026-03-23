@@ -25,24 +25,24 @@ export interface AIResponse {
 
 // --- Redux Framework Types ---
 
-export type FieldType = 
+export type FieldType =
   // Basic
-  | 'text' 
-  | 'textarea' 
+  | 'text'
+  | 'textarea'
   | 'checkbox'
   | 'radio'
-  | 'select' 
-  | 'switch' 
+  | 'select'
+  | 'switch'
   | 'button_set'
   | 'number'
   | 'password'
   | 'date'
   | 'multi_text'
-  
+
   // Design & Media
   | 'color'
   | 'slider'
-  | 'image' 
+  | 'image'
   | 'gallery' // Multiple images
   | 'media'   // Single file/image
   | 'background'
@@ -55,20 +55,25 @@ export type FieldType =
   // Editors
   | 'editor'  // WYSIWYG
   | 'ace_editor' // Code
-  
+
   // Layout/Presentation
   | 'section' // Sub-section header
   | 'divide'  // HR
   | 'info'    // Notice
   | 'raw'     // HTML
-  
+
   // Extensions / Advanced
   | 'social_profiles'
   | 'sortable'
   | 'repeater'
-  
+
   // Special
-  | 'seo_composite';
+  | 'seo_composite'
+
+  // Preset / Layout Chooser
+  | 'svg_chooser'
+  | 'preset_chooser'
+  | 'layout_chooser';
 
 export interface SocialProfileItem {
   id: string;
@@ -79,29 +84,29 @@ export interface SocialProfileItem {
 }
 
 export interface OptionField {
-  id: string; 
+  id: string;
   type: FieldType;
   title?: string; // Optional for dividers/raw
   subtitle?: string;
   desc?: string; // Description below field
   placeholder?: string;
-  options?: Record<string, string>; 
+  options?: Record<string, string>;
   default?: any;
-  min?: number; 
-  max?: number; 
-  step?: number; 
+  min?: number;
+  max?: number;
+  step?: number;
   unit?: string;
-  
+
   // Input Addons
   addon_before?: string;
   addon_after?: string;
-  
+
   // For Raw field
   content?: string;
-  
+
   // For Typography/Spacing etc
-  units?: string[]; 
-  
+  units?: string[];
+
   // For Repeater (Recursive)
   fields?: OptionField[];
   group_values?: boolean; // If true, the group title uses the value of the first field
@@ -111,7 +116,7 @@ export interface OptionField {
 export interface OptionSection {
   id: string;
   title: string;
-  icon: any; 
+  icon: any;
   fields: OptionField[];
 }
 

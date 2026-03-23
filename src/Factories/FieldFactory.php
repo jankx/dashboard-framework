@@ -19,6 +19,7 @@ use Jankx\Dashboard\Elements\Fields\SliderField;
 use Jankx\Dashboard\Elements\Fields\TypographyField;
 use Jankx\Dashboard\Elements\Fields\BackgroundField;
 use Jankx\Dashboard\Elements\Fields\SpacingField;
+use Jankx\Dashboard\Elements\Fields\SvgChooserField;
 
 class FieldFactory
 {
@@ -85,6 +86,11 @@ class FieldFactory
             case 'spacing':
             case 'dimensions':
                 return static::createSpacingField($id, $title, $args);
+
+            case 'svg_chooser':
+            case 'preset_chooser':
+            case 'layout_chooser':
+                return static::createSvgChooserField($id, $title, $args);
         }
 
         return null;
@@ -152,5 +158,10 @@ class FieldFactory
     protected static function createSpacingField($id, $title, $args)
     {
         return new SpacingField($id, $title, $args);
+    }
+
+    protected static function createSvgChooserField($id, $title, $args)
+    {
+        return new SvgChooserField($id, $title, $args);
     }
 }
