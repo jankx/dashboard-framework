@@ -1,5 +1,5 @@
    // src/index.js
-   import React from 'react';
+   const React = window.wp.element;
    import { createRoot } from 'react-dom/client';
    import { Provider } from 'react-redux';
    import store from './store'; // Import store

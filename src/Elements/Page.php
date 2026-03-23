@@ -103,50 +103,46 @@ class Page implements PageInterface, OptionsPageInterface, JsonSerializable, Arr
     public function jsonSerialize(): array
     {
         return [
+            'id' => $this->id,
             'title' => $this->title,
+            'subtitle' => $this->subtitle,
+            'description' => $this->description,
+            'priority' => $this->priority,
             'sections' => $this->sections,
+            'icon' => $this->icon,
         ];
     }
 
     // ArrayAccess implementation
     public function offsetExists($offset): bool
     {
-        return in_array($offset, ['title', 'sections']);
+        return property_exists($this, $offset) || in_array($offset, ['name']);
     }
 
     public function offsetGet($offset): mixed
     {
-        switch ($offset) {
-            case 'title':
-                return $this->title;
-            case 'sections':
-                return $this->sections;
-            default:
-                return null;
+        if ($offset === 'name') {
+            return $this->title;
         }
+
+        if (property_exists($this, $offset)) {
+            return $this->$offset;
+        }
+
+        return null;
     }
 
     public function offsetSet($offset, $value): void
     {
-        switch ($offset) {
-            case 'title':
-                $this->title = $value;
-                break;
-            case 'sections':
-                $this->sections = $value;
-                break;
+        if (property_exists($this, $offset)) {
+            $this->$offset = $value;
         }
     }
 
     public function offsetUnset($offset): void
     {
-        switch ($offset) {
-            case 'title':
-                $this->title = null;
-                break;
-            case 'sections':
-                $this->sections = [];
-                break;
+        if (property_exists($this, $offset)) {
+            $this->$offset = is_array($this->$offset) ? [] : null;
         }
     }
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+const React = window.wp.element;
 import { FieldProps } from '../types';
 import { Image as ImageIcon, Plus, X } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+const React = window.wp.element; import { Component } from 'react';
 import { connect } from 'react-redux';
 import {
     Box,
