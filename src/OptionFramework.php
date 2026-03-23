@@ -67,7 +67,8 @@ class OptionFramework
             'capability' => 'manage_options',
             'menu_type' => 'add_theme_menu',
             'menu_slug' => null, // Nếu set, sẽ sử dụng slug này thay vì {$instance_name}-options
-            'auto_register_menu' => true // Bật/tắt việc tự động đăng ký menu
+            'auto_register_menu' => true, // Bật/tắt việc tự động đăng ký menu
+            'sync_with_customizer' => false, // Bật/tắt việc đồng bộ với WordPress Customizer
         ]);
 
         // Lưu menu_slug nếu được set trong config
@@ -82,7 +83,37 @@ class OptionFramework
             remove_action('admin_menu', [$this, 'addOptionsPage']);
         }
 
+        // Đăng ký Customizer nếu được bật
+        if (!empty($this->config['sync_with_customizer'])) {
+            add_action('customize_register', [$this, 'registerCustomizer']);
+            add_action('customize_controls_enqueue_scripts', [$this, 'enqueueCustomizerScripts']);
+        }
+
         return $this;
+    }
+
+    /**
+     * Enqueue Customizer scripts and styles
+     */
+    public function enqueueCustomizerScripts()
+    {
+        $base_url = get_stylesheet_directory_uri() . '/vendor/jankx/dashboard-framework/gui/assets';
+        $version = '1.1.0'; // Stable Release
+        
+        wp_enqueue_script(
+            'jankx-customizer-controls',
+            $base_url . '/customizer.js',
+            ['jquery', 'customize-controls', 'wp-element', 'react'],
+            $version,
+            true
+        );
+
+        wp_enqueue_style(
+            'jankx-customizer-controls',
+            $base_url . '/customizer.css',
+            [],
+            $version
+        );
     }
 
     /**
@@ -215,9 +246,9 @@ class OptionFramework
                             'title' => $fieldTitle,
                         ];
                         
-                        // Add args properties
-                        if (isset($fieldArgs['subtitle']) || isset($fieldArgs['sub_title'])) {
-                            $fieldData['subtitle'] = $fieldArgs['subtitle'] ?? $fieldArgs['sub_title'];
+                        // Merge all args properties
+                        if (!empty($fieldArgs)) {
+                            $fieldData = array_merge($fieldData, (array) $fieldArgs);
                         }
                         if (isset($fieldArgs['default']) || isset($fieldArgs['default_value'])) {
                             $fieldData['default'] = $fieldArgs['default'] ?? $fieldArgs['default_value'] ?? null;
@@ -380,6 +411,7 @@ class OptionFramework
             $mapped_pages = $this->getMergedPages();
             
             // Handle independent field saving
+            $sync_with_customizer = $this->config['sync_with_customizer'] ?? false;
             foreach ($mapped_pages as $page) {
                 foreach ($page['sections'] as $section) {
                     foreach ($section['fields'] as $field) {
@@ -387,6 +419,11 @@ class OptionFramework
                         if (isset($options_data[$field_id])) {
                             $value = $options_data[$field_id];
                             
+                            // Synchronize with WordPress Customizer
+                            if ($sync_with_customizer) {
+                                set_theme_mod($field_id, $value);
+                            }
+
                             // Custom writer? (function name in config)
                             if (isset($field['writer']) && is_callable($field['writer'])) {
                                 call_user_func($field['writer'], $value, $field_id);
@@ -432,6 +469,7 @@ class OptionFramework
         }
 
         // Aggregate with custom getters and individual option names
+        $sync_with_customizer = $this->config['sync_with_customizer'] ?? false;
         $mapped_pages = $this->getMergedPages();
         foreach ($mapped_pages as $page) {
             foreach ($page['sections'] as $section) {
@@ -440,13 +478,19 @@ class OptionFramework
                     $custom_value = null;
                     $has_custom = false;
 
+                    // Fetch from Customizer (theme_mod) if sync is enabled
+                    if ($sync_with_customizer) {
+                        $custom_value = get_theme_mod($field_id, $field['default'] ?? null);
+                        $has_custom = true;
+                    }
+
                     // Custom getter?
-                    if (isset($field['getter']) && is_callable($field['getter'])) {
+                    if (!$has_custom && isset($field['getter']) && is_callable($field['getter'])) {
                         $custom_value = call_user_func($field['getter'], $field_id);
                         $has_custom = true;
                     }
                     // Individual option name?
-                    elseif (isset($field['option_name']) && !empty($field['option_name'])) {
+                    elseif (!$has_custom && isset($field['option_name']) && !empty($field['option_name'])) {
                         $custom_value = get_option($field['option_name'], $field['default'] ?? null);
                         $has_custom = true;
                     }
@@ -497,6 +541,130 @@ class OptionFramework
                 'jankx-theme-options',
                 [$this, 'renderPage']
             );
+        }
+    }
+
+    /**
+     * Map framework field types to WordPress Customizer control types
+     *
+     * @param string $type
+     * @return string|null
+     */
+    protected function mapCustomizerControl($type)
+    {
+        $map = [
+            'text'        => 'text',
+            'textarea'    => 'textarea',
+            'checkbox'    => 'checkbox',
+            'switch'      => 'checkbox',
+            'radio'       => 'radio',
+            'select'      => 'select',
+            'number'      => 'number',
+            'slider'      => 'number',
+            'color'       => 'WP_Customize_Color_Control',
+            'image'       => 'WP_Customize_Image_Control',
+            'media'       => 'WP_Customize_Image_Control',
+            'upload'      => 'WP_Customize_Image_Control',
+            'typography'  => \Jankx\Dashboard\Customizer\Controls\TypographyControl::class,
+        ];
+
+        return $map[$type] ?? null;
+    }
+
+    /**
+     * Register panels, sections, and controls into WordPress Customizer
+     *
+     * @param \WP_Customize_Manager $wp_customize
+     */
+    public function registerCustomizer($wp_customize)
+    {
+        if (file_exists(__DIR__ . '/Customizer/Controls/TypographyControl.php')) {
+            require_once __DIR__ . '/Customizer/Controls/TypographyControl.php';
+        }
+
+        $mapped_pages = $this->getMergedPages();
+        
+        foreach ($mapped_pages as $page) {
+            $page_title = $page['name'] ?? $page['title'] ?? null;
+            $page_id = $page['id'] ?? null;
+            $sections = $page['sections'] ?? [];
+
+            if (empty($page_title) || empty($page_id) || empty($sections)) {
+                continue;
+            }
+
+            // Group sections into panels if more than one
+            $is_panel = count($sections) > 1;
+            $panel_id = null;
+
+            if ($is_panel) {
+                $panel_id = "jankx_panel_{$page_id}";
+                $wp_customize->add_panel($panel_id, [
+                    'title' => $page_title,
+                    'description' => $page['args']['description'] ?? $page['description'] ?? '',
+                    'priority' => ($page['args']['priority'] ?? 30) + 160,
+                ]);
+            }
+
+            foreach ($sections as $section) {
+                $section_title = $section['name'] ?? $section['title'] ?? null;
+                $sid = $section['id'] ?? null;
+                $fields = $section['fields'] ?? [];
+
+                if (empty($section_title) || empty($sid)) {
+                    continue;
+                }
+
+                $section_id = "jankx_section_{$sid}";
+                
+                $wp_customize->add_section($section_id, [
+                    'title' => $is_panel ? $section_title : $page_title,
+                    'description' => $section['description'] ?? '',
+                    'panel' => $panel_id,
+                    'priority' => $is_panel ? ($section['priority'] ?? 30) : (($page['args']['priority'] ?? 10) + 160),
+                ]);
+
+                foreach ($fields as $field) {
+                    $setting_id = $field['id'];
+                    if (empty($setting_id)) {
+                        continue;
+                    }
+
+                    $type = $field['type'] ?? 'text';
+                    $control_class = $this->mapCustomizerControl($type);
+
+                    if (empty($control_class)) {
+                        continue;
+                    }
+
+                    $default = $field['default'] ?? null;
+                    
+                    // Register setting
+                    $wp_customize->add_setting($setting_id, [
+                        'default' => $default,
+                        'type' => 'theme_mod',
+                        'capability' => $this->config['capability'] ?? 'edit_theme_options',
+                        'transport' => $field['transport'] ?? 'refresh',
+                        'sanitize_callback' => $field['sanitize_callback'] ?? 'sanitize_text_field',
+                    ]);
+
+                    $control_args = [
+                        'label' => $field['title'] ?? $field['name'] ?? $setting_id,
+                        'description' => $field['subtitle'] ?? $field['desc'] ?? '',
+                        'section' => $section_id,
+                        'choices' => $field['options'] ?? [],
+                    ];
+
+                    // Add control (standard or specialized)
+                    if (!class_exists($control_class)) {
+                        $control_args['type'] = $control_class;
+                        $wp_customize->add_control($setting_id, $control_args);
+                    } else {
+                        // specialized class-based controls
+                        $wp_customize->add_control(new $control_class($wp_customize, $setting_id, $control_args));
+                    }
+                }
+            }
         }
     }
 

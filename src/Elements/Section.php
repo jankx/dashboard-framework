@@ -100,7 +100,12 @@ class Section implements SectionInterface, OptionsSectionInterface, JsonSerializ
     public function jsonSerialize(): array
     {
         return [
+            'id' => $this->id,
             'title' => $this->title,
+            'subtitle' => $this->subtitle,
+            'description' => $this->description,
+            'priority' => $this->priority,
+            'icon' => $this->icon,
             'fields' => $this->fields,
         ];
     }
@@ -108,42 +113,33 @@ class Section implements SectionInterface, OptionsSectionInterface, JsonSerializ
     // ArrayAccess implementation
     public function offsetExists($offset): bool
     {
-        return in_array($offset, ['title', 'fields']);
+        return property_exists($this, $offset) || in_array($offset, ['name']);
     }
 
     public function offsetGet($offset): mixed
     {
-        switch ($offset) {
-            case 'title':
-                return $this->title;
-            case 'fields':
-                return $this->fields;
-            default:
-                return null;
+        if ($offset === 'name') {
+            return $this->title;
         }
+
+        if (property_exists($this, $offset)) {
+            return $this->$offset;
+        }
+
+        return null;
     }
 
     public function offsetSet($offset, $value): void
     {
-        switch ($offset) {
-            case 'title':
-                $this->title = $value;
-                break;
-            case 'fields':
-                $this->fields = $value;
-                break;
+        if (property_exists($this, $offset)) {
+            $this->$offset = $value;
         }
     }
 
     public function offsetUnset($offset): void
     {
-        switch ($offset) {
-            case 'title':
-                $this->title = null;
-                break;
-            case 'fields':
-                $this->fields = [];
-                break;
+        if (property_exists($this, $offset)) {
+            $this->$offset = is_array($this->$offset) ? [] : null;
         }
     }
 }

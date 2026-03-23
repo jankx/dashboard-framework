@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+const React = window.wp.element; import { useRef, useEffect } from 'react';
 import { FieldProps } from '../types';
 import { Eye, EyeOff, Calendar, Trash2, Plus } from 'lucide-react';
 

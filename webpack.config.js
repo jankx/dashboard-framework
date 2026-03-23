@@ -1,11 +1,15 @@
 const path = require('path');
+const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-    entry: './gui/index.js',
+    entry: {
+        bundle: './gui/index.js',
+        customizer: './gui/customizer.tsx'
+    },
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.js',
+        path: path.resolve(__dirname, 'gui/assets'),
+        filename: '[name].js',
         publicPath: '/'
     },
     module: {
@@ -52,8 +56,16 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: 'styles.css',
+            filename: '[name].css',
+        }),
+        new webpack.ProvidePlugin({
+            React: ['wp', 'element'],
+            ReactDOM: ['wp', 'element', 'render'],
         }),
     ],
+    externals: {
+        'react': ['wp', 'element'],
+        'react-dom': ['wp', 'element']
+    },
     mode: 'development'
 };
