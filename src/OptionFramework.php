@@ -340,8 +340,75 @@ class OptionFramework
             'nonce' => $nonce
         ]);
 
+        $framework_version = '1.0.0'; // Default fallback
+        $icon = $this->config['menu_icon'] ?? 'dashicons-admin-generic';
+        $title = $this->page_title;
+        $subtitle = __('Cấu hình các tùy chọn cho giao diện website của bạn.', 'jankx');
+
         ?>
-        <div id="option-framework-app"></div>
+        <div class="jankx-admin-page-container jankx-theme-options-page">
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+                .jankx-admin-page-container {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    margin: 20px 20px 20px 0;
+                    color: #1e293b;
+                }
+
+                .jankx-universal-header {
+                    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                    padding: 40px;
+                    border-radius: 24px;
+                    color: #f8fafc;
+                    margin-bottom: 30px;
+                    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1);
+                }
+
+                .jankx-universal-header .header-content { display: flex; align-items: center; gap: 24px; }
+                .jankx-universal-header .header-icon {
+                    width: 64px; height: 64px;
+                    background: rgba(59, 130, 246, 0.2);
+                    border-radius: 18px;
+                    display: flex; align-items: center; justify-content: center;
+                    border: 1px solid rgba(59, 130, 246, 0.3);
+                }
+                .jankx-universal-header .header-icon .dashicons { font-size: 32px; width: 32px; height: 32px; color: #60a5fa; }
+                .jankx-universal-header .header-text h1 { margin: 0; font-size: 28px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 12px; }
+                .jankx-universal-header .version-badge { font-size: 12px; background: rgba(59, 130, 246, 0.5); padding: 4px 10px; border-radius: 20px; font-weight: 600; }
+                .jankx-universal-header .header-text .subtitle { margin: 8px 0 0 0; font-size: 16px; color: #94a3b8; }
+                .jankx-admin-footer {
+                    margin-top: 50px;
+                    padding-top: 20px;
+                    border-top: 1px solid #e2e8f0;
+                    color: #64748b;
+                    font-size: 13px;
+                    text-align: center;
+                }
+                #option-framework-app { min-height: 500px; }
+            </style>
+
+            <header class="jankx-universal-header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <span class="dashicons <?php echo esc_attr($icon); ?>"></span>
+                    </div>
+                    <div class="header-text">
+                        <h1><?php echo esc_html($title); ?> <span class="version-badge">v<?php echo $framework_version; ?></span></h1>
+                        <p class="subtitle"><?php echo esc_html($subtitle); ?></p>
+                    </div>
+                </div>
+            </header>
+
+            <div class="jankx-universal-content">
+                <div id="option-framework-app"></div>
+            </div>
+
+            <footer class="jankx-admin-footer">
+                <p>&copy; <?php echo date('Y'); ?> Jankx Framework. Made with <span class="dashicons dashicons-heart" style="color: #ef4444; font-size: 14px; width: 14px; height: 14px;"></span> by Puleeno.</p>
+            </footer>
+        </div>
+
         <script type="text/javascript">
             const instanceName = '<?php echo esc_js($this->instance_name); ?>';
         </script>
