@@ -323,32 +323,43 @@ class OptionFramework
             return;
         }
 
-        // Safely get input data
-        $input_data = file_get_contents('php://input');
-        if (empty($input_data)) {
+        // Try to get data from $_POST first (standard WordPress AJAX)
+        $options_json = isset($_POST['data']) ? wp_unslash($_POST['data']) : null;
+
+        // If not in $_POST, try to read from php://input (for application/json)
+        if (empty($options_json)) {
+            $input_data = file_get_contents('php://input');
+            if (!empty($input_data)) {
+                $data = json_decode($input_data, true);
+                if (json_last_error() === JSON_ERROR_NONE && isset($data['data'])) {
+                    $options_json = $data['data'];
+                }
+            }
+        }
+
+        if (empty($options_json)) {
             wp_send_json_error('Không có dữ liệu được gửi');
             return;
         }
 
-        $data = json_decode($input_data, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            wp_send_json_error('Dữ liệu JSON không hợp lệ');
-            return;
-        }
-
-        if (!isset($data['data'])) {
-            wp_send_json_error('Thiếu dữ liệu cần thiết');
-            return;
-        }
-
-        $options_data = json_decode($data['data'], true);
+        $options_data = is_array($options_json) ? $options_json : json_decode($options_json, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             wp_send_json_error('Dữ liệu options không hợp lệ');
             return;
         }
 
         if (is_array($options_data)) {
-            $result = update_option($this->instance_name, json_encode($options_data));
+            // Get existing options to compare
+            $existing_options = get_option($this->instance_name);
+            $new_options_json = json_encode($options_data);
+
+            // update_option returns false if value is the same, so we check if it changed
+            if ($existing_options === $new_options_json) {
+                wp_send_json_success('Không có thay đổi nào để lưu');
+                return;
+            }
+
+            $result = update_option($this->instance_name, $new_options_json);
             if ($result) {
                 wp_send_json_success('Lưu options thành công');
             } else {
