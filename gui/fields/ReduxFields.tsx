@@ -1,4 +1,4 @@
-const React = window.wp.element;
+import React from 'react';
 import { FieldProps } from '../types';
 
 // Import all isolated fields
@@ -67,6 +67,8 @@ export const ReduxFieldRenderer: React.FC<FieldProps> = (props) => {
             case 'spacing': return <FieldSpacing {...props} />;
             case 'dimensions': return <FieldDimensions {...props} />;
 
+            case 'image':
+            case 'upload':
             case 'media': return <FieldMedia {...props} />;
             case 'gallery': return <FieldGallery {...props} />;
 

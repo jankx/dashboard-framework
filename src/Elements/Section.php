@@ -24,7 +24,7 @@ class Section implements SectionInterface, OptionsSectionInterface, JsonSerializ
     public function __construct($title, $fields = [])
     {
         $this->title = $title;
-        $this->fields = $fields;
+        $this->fields = is_array($fields) ? $fields : [];
         $this->id = sanitize_title($title);
         $this->subtitle = '';
         $this->description = '';

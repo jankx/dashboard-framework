@@ -235,75 +235,12 @@ class OptionFramework
                     $sectionId = $section->getId() ?: sanitize_title($section->getTitle());
                     $fields = [];
                     foreach ($section->getFields() as $field) {
-                        $fieldId = $field->getId() ?: '';
-                        $fieldType = $field->getType() ?: 'text';
-                        $fieldTitle = $field->getTitle() ?: '';
-                        $fieldArgs = $field->getArgs() ?: [];
-                        
-                        $fieldData = [
-                            'id' => $fieldId,
-                            'type' => $fieldType,
-                            'title' => $fieldTitle,
-                        ];
-                        
-                        // Merge all args properties
-                        if (!empty($fieldArgs)) {
-                            $fieldData = array_merge($fieldData, (array) $fieldArgs);
-                        }
-                        if (isset($fieldArgs['default']) || isset($fieldArgs['default_value'])) {
-                            $fieldData['default'] = $fieldArgs['default'] ?? $fieldArgs['default_value'] ?? null;
-                        }
-                        if (isset($fieldArgs['options'])) {
-                            $fieldData['options'] = $fieldArgs['options'];
-                        }
-                        if (isset($fieldArgs['placeholder'])) {
-                            $fieldData['placeholder'] = $fieldArgs['placeholder'];
-                        }
-                        if (isset($fieldArgs['min'])) {
-                            $fieldData['min'] = $fieldArgs['min'];
-                        }
-                        if (isset($fieldArgs['max'])) {
-                            $fieldData['max'] = $fieldArgs['max'];
-                        }
-                        if (isset($fieldArgs['step'])) {
-                            $fieldData['step'] = $fieldArgs['step'];
-                        }
-                        if (isset($fieldArgs['unit'])) {
-                            $fieldData['unit'] = $fieldArgs['unit'];
-                        }
-                        if (isset($fieldArgs['width'])) {
-                            $fieldData['width'] = $fieldArgs['width'];
-                        }
-                        if (isset($fieldArgs['height'])) {
-                            $fieldData['height'] = $fieldArgs['height'];
-                        }
-                        if (isset($fieldArgs['option_name'])) {
-                            $fieldData['option_name'] = $fieldArgs['option_name'];
-                        }
-                        if (isset($fieldArgs['writer'])) {
-                           if ($for_js) {
-                               if (is_string($fieldArgs['writer'])) {
-                                   $fieldData['writer'] = $fieldArgs['writer'];
-                               }
-                           } else {
-                               $fieldData['writer'] = $fieldArgs['writer'];
-                           }
-                        }
-                        if (isset($fieldArgs['getter'])) {
-                           if ($for_js) {
-                               if (is_string($fieldArgs['getter'])) {
-                                   $fieldData['getter'] = $fieldArgs['getter'];
-                               }
-                           } else {
-                               $fieldData['getter'] = $fieldArgs['getter'];
-                           }
-                        }
-                        
-                        $fields[] = $fieldData;
+                        $fields[] = $this->transformFieldToArray($field, $for_js);
                     }
                     $sections[$sectionId] = [
                         'id' => $sectionId,
                         'title' => $section->getTitle(),
+                        'description' => $section->getDescription(),
                         'fields' => $fields,
                     ];
                 }
@@ -311,14 +248,70 @@ class OptionFramework
                     'id' => $pageId,
                     'title' => $page->getTitle(),
                     'icon' => $page->getIcon(),
+                    'description' => $page->getDescription(),
                     'sections' => $sections,
                 ];
             } else {
-                // Already array format
                 $result[$key] = $page;
             }
         }
         return $result;
+    }
+
+    /**
+     * Transform a single field object to array format
+     *
+     * @param mixed $field
+     * @param bool $for_js
+     * @return array
+     */
+    private function transformFieldToArray($field, $for_js = false) {
+        if (!($field instanceof \Jankx\Dashboard\Elements\Field)) {
+            return (array) $field;
+        }
+
+        $type = $field->getType();
+        if ($for_js) {
+            if ($type === 'image') {
+                $type = 'media';
+            }
+            // Map checkbox without options to switch for UI compatibility
+            if ($type === 'checkbox' && !isset($field->getArgs()['options'])) {
+                $type = 'switch';
+            }
+        }
+
+        $fieldData = [
+            'id' => $field->getId(),
+            'type' => $type,
+            'title' => $field->getTitle(),
+            'subtitle' => $field->getSubtitle(),
+            'description' => $field->getDescription(),
+        ];
+
+        $fieldArgs = $field->getArgs();
+        if (!empty($fieldArgs)) {
+            // Filter some args if for JS
+            if ($for_js) {
+                // If writer/getter are closures, they can't be serialized to JS
+                if (isset($fieldArgs['writer']) && !is_string($fieldArgs['writer'])) {
+                    unset($fieldArgs['writer']);
+                }
+                if (isset($fieldArgs['getter']) && !is_string($fieldArgs['getter'])) {
+                    unset($fieldArgs['getter']);
+                }
+            }
+            $fieldData = array_merge($fieldData, (array) $fieldArgs);
+        }
+
+        // Recursively transform sub-fields (useful for Repeater/Group)
+        if (isset($fieldData['fields']) && is_array($fieldData['fields'])) {
+            foreach ($fieldData['fields'] as $key => $subField) {
+                $fieldData['fields'][$key] = $this->transformFieldToArray($subField, $for_js);
+            }
+        }
+
+        return $fieldData;
     }
 
     // Lấy options đã merge để truyền sang JS
@@ -430,8 +423,8 @@ class OptionFramework
             // Coloris and Air Datepicker CSS are now bundled in styles.css (no CDN needed)
             // Tải script và CSS chỉ khi ở trên trang tùy chọn
             // All dependencies (coloris, air-datepicker) are bundled in bundle.js and styles.css
-            wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.40', ['wp-element'], null, true);
-            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/styles.css?v=1.0.0.26');
+            wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.41', ['wp-element'], null, true);
+            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/styles.css?v=1.0.0.27');
 
             // Add WordPress Media Uploader
             wp_enqueue_media();
@@ -474,6 +467,8 @@ class OptionFramework
         }
 
         if (is_array($options_data)) {
+            do_action('jankx_dashboard_before_save_options', $options_data, $this->instance_name);
+
             // Get all registered fields to check for custom writers/option names
             $mapped_pages = $this->getMergedPages();
             
@@ -519,6 +514,7 @@ class OptionFramework
 
             $result = update_option($this->instance_name, $options_data);
             if ($result) {
+                do_action('jankx_dashboard_after_save_options', $options_data, $this->instance_name);
                 wp_send_json_success('Lưu options thành công');
             } else {
                 wp_send_json_error('Không thể lưu options');
@@ -582,6 +578,69 @@ class OptionFramework
         $this->pages[$page->getTitle()] = $page; // Sử dụng title làm key
     }
 
+    /**
+     * Set all options via a single array (WP-friendly way)
+     *
+     * @param array $options_array
+     * @return $this
+     */
+    public function setOptions(array $options_array)
+    {
+        foreach ($options_array as $page_data) {
+            $id = $page_data['id'] ?? '';
+            $title = $page_data['name'] ?? $page_data['title'] ?? $id;
+            
+            $page = new Page($title);
+            if (!empty($id)) {
+                $page->setId($id);
+            }
+            if (isset($page_data['icon'])) {
+                $page->setIcon($page_data['icon']);
+            }
+            if (isset($page_data['description'])) {
+                $page->setDescription($page_data['description']);
+            }
+            if (isset($page_data['args'])) {
+                foreach ($page_data['args'] as $key => $val) {
+                    if (method_exists($page, 'set' . ucfirst($key))) {
+                        call_user_func([$page, 'set' . ucfirst($key)], $val);
+                    }
+                }
+            }
+
+            if (isset($page_data['sections'])) {
+                foreach ($page_data['sections'] as $section_data) {
+                    $sid = $section_data['id'] ?? '';
+                    $stitle = $section_data['name'] ?? $section_data['title'] ?? $sid;
+                    
+                    $section = new \Jankx\Dashboard\Elements\Section($stitle);
+                    if (!empty($sid)) {
+                        $section->setId($sid);
+                    }
+                    if (isset($section_data['description'])) {
+                        $section->setDescription($section_data['description']);
+                    }
+                    if (isset($section_data['fields'])) {
+                        foreach ($section_data['fields'] as $field_data) {
+                            $field = \Jankx\Dashboard\Factories\FieldFactory::create(
+                                $field_data['id'] ?? '',
+                                $field_data['name'] ?? $field_data['title'] ?? '',
+                                $field_data['type'] ?? 'text',
+                                $field_data
+                            );
+                            if ($field) {
+                                $section->addField($field);
+                            }
+                        }
+                    }
+                    $page->addSection($section);
+                }
+            }
+            $this->addPage($page);
+        }
+        return $this;
+    }
+
     public function getInstanceName()
     {
         return $this->instance_name;
@@ -634,9 +693,11 @@ class OptionFramework
             'slider'      => 'number',
             'color'       => 'WP_Customize_Color_Control',
             'image'       => 'WP_Customize_Image_Control',
-            'media'       => 'WP_Customize_Image_Control',
+            'media'       => 'WP_Customize_Media_Control',
             'upload'      => 'WP_Customize_Image_Control',
             'typography'  => \Jankx\Dashboard\Customizer\Controls\TypographyControl::class,
+            'repeater'    => 'textarea', // Fallback for now
+            'divide'      => null, // Dividers usually don't have a customizer control
         ];
 
         return $map[$type] ?? null;

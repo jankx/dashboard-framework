@@ -1,6 +1,5 @@
-   // src/index.js
-   const React = window.wp.element;
-   import { createRoot } from 'react-dom/client';
+   import React from 'react';
+   const { createRoot } = window.wp.element;
    import { Provider } from 'react-redux';
    import store from './store'; // Import store
    import OptionFrameworkApp from './components/OptionFrameworkApp';

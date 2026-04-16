@@ -1,4 +1,4 @@
-const React = window.wp.element; import { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { FieldProps } from '../types';
 import { Eye, EyeOff, Calendar, Trash2, Plus } from 'lucide-react';
 
@@ -17,7 +17,7 @@ const localeEn = {
 };
 
 export const FieldInput: React.FC<FieldProps & { type: 'text' | 'number' | 'password' }> = ({ field, value, onChange, type }) => {
-  const [showPassword, setShowPassword] = React.useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const inputType = type === 'password' && showPassword ? 'text' : type;
 
   const wrapperStyle: React.CSSProperties = {

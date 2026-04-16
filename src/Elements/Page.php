@@ -24,8 +24,8 @@ class Page implements PageInterface, OptionsPageInterface, JsonSerializable, Arr
     public function __construct($title, $sections = [], $icon = '')
     {
         $this->title = $title;
-        $this->sections = $sections;
-        $this->icon = $icon;
+        $this->sections = is_array($sections) ? $sections : [];
+        $this->icon = $icon ?: (is_string($sections) ? $sections : '');
         $this->id = sanitize_title($title);
         $this->subtitle = '';
         $this->description = '';

@@ -19,17 +19,24 @@ class CheckboxField extends Field implements CheckboxFieldInterface
 
         $this->args = array_merge([
             'default' => false,
+            'options' => [], // If provided, behaves like a group of checkboxes
             'description' => '',
+            'layout' => 'horizontal', // horizontal, vertical
         ], $this->args);
+    }
+
+    public function hasOptions()
+    {
+        return !empty($this->args['options']);
+    }
+
+    public function getOptions()
+    {
+        return $this->args['options'] ?? [];
     }
 
     public function getDefaultValue()
     {
-        return $this->args['default'] ?? false;
-    }
-
-    public function getDescription()
-    {
-        return $this->args['description'] ?? '';
+        return $this->args['default'] ?? ($this->hasOptions() ? [] : false);
     }
 }

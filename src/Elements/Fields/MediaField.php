@@ -7,11 +7,11 @@ if (!defined('ABSPATH')) {
 }
 
 use Jankx\Dashboard\Elements\Field;
-use Jankx\Dashboard\Interfaces\Fields\ImageFieldInterface;
+use Jankx\Dashboard\Interfaces\Fields\MediaFieldInterface;
 
-class ImageField extends Field implements ImageFieldInterface
+class MediaField extends Field implements MediaFieldInterface
 {
-    protected $type = 'image';
+    protected $type = 'media';
 
     public function __construct($id, $title, $args = [])
     {
@@ -22,16 +22,12 @@ class ImageField extends Field implements ImageFieldInterface
             'url' => true,
             'preview' => true,
             'library' => 'all', // image, video, audio, all
+            'multiple' => false,
         ], $this->args);
     }
 
-    public function hasPreview()
+    public function isMultiple()
     {
-        return (bool) ($this->args['preview'] ?? true);
-    }
-
-    public function getLibraryType()
-    {
-        return $this->args['library'] ?? 'image';
+        return (bool) ($this->args['multiple'] ?? false);
     }
 }

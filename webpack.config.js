@@ -8,7 +8,7 @@ module.exports = {
         customizer: './gui/customizer.tsx'
     },
     output: {
-        path: path.resolve(__dirname, 'gui/assets'),
+        path: path.resolve(__dirname, 'dist'),
         filename: '[name].js',
         publicPath: '/'
     },
@@ -64,8 +64,8 @@ module.exports = {
         }),
     ],
     externals: {
-        'react': ['wp', 'element'],
-        'react-dom': ['wp', 'element']
+        'react': 'React',
+        'react-dom': 'ReactDOM'
     },
     mode: 'development'
 };

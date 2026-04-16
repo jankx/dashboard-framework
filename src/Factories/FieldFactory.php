@@ -20,6 +20,10 @@ use Jankx\Dashboard\Elements\Fields\TypographyField;
 use Jankx\Dashboard\Elements\Fields\BackgroundField;
 use Jankx\Dashboard\Elements\Fields\SpacingField;
 use Jankx\Dashboard\Elements\Fields\SvgChooserField;
+use Jankx\Dashboard\Elements\Fields\DivideField;
+use Jankx\Dashboard\Elements\Fields\SocialProfilesField;
+use Jankx\Dashboard\Elements\Fields\RepeaterField;
+use Jankx\Dashboard\Elements\Fields\MediaField;
 
 class FieldFactory
 {
@@ -91,6 +95,21 @@ class FieldFactory
             case 'preset_chooser':
             case 'layout_chooser':
                 return static::createSvgChooserField($id, $title, $args);
+
+            case 'divide':
+            case 'divider':
+                return static::createDivideField($id, $title, $args);
+
+            case 'social_profiles':
+                return static::createSocialProfilesField($id, $title, $args);
+
+            case 'repeater':
+            case 'group':
+                return static::createRepeaterField($id, $title, $args);
+
+            case 'media':
+            case 'upload':
+                return static::createMediaField($id, $title, $args);
         }
 
         return null;
@@ -163,5 +182,25 @@ class FieldFactory
     protected static function createSvgChooserField($id, $title, $args)
     {
         return new SvgChooserField($id, $title, $args);
+    }
+
+    protected static function createDivideField($id, $title, $args)
+    {
+        return new DivideField($id, $title, $args);
+    }
+
+    protected static function createSocialProfilesField($id, $title, $args)
+    {
+        return new SocialProfilesField($id, $title, $args);
+    }
+
+    protected static function createRepeaterField($id, $title, $args)
+    {
+        return new RepeaterField($id, $title, $args);
+    }
+
+    protected static function createMediaField($id, $title, $args)
+    {
+        return new MediaField($id, $title, $args);
     }
 }

@@ -1,4 +1,4 @@
-const React = window.wp.element;
+import React from 'react';
 import { FieldProps } from '../types';
 
 export const FieldSwitch: React.FC<FieldProps> = ({ value, onChange }) => (
@@ -17,6 +17,18 @@ export const FieldSelect: React.FC<FieldProps> = ({ field, value, onChange }) =>
 );
 
 export const FieldCheckbox: React.FC<FieldProps> = ({ field, value, onChange }) => {
+  const options = field.options || {};
+  const hasOptions = Object.keys(options).length > 0;
+
+  if (!hasOptions) {
+      return (
+          <label style={{display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '14px'}}>
+              <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} />
+              <span>{field.label || field.title || 'Enable'}</span>
+          </label>
+      );
+  }
+
   const currentValues = Array.isArray(value) ? value : [];
   const handleToggle = (key: string) => {
     if (currentValues.includes(key)) onChange(currentValues.filter((v: string) => v !== key));
@@ -24,7 +36,7 @@ export const FieldCheckbox: React.FC<FieldProps> = ({ field, value, onChange }) 
   };
   return (
     <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
-      {field.options && Object.entries(field.options).map(([key, label]) => (
+      {Object.entries(options).map(([key, label]) => (
         <label key={key} style={{display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', fontSize: '14px'}}>
           <input type="checkbox" checked={currentValues.includes(key)} onChange={() => handleToggle(key)} />
           <span>{label}</span>

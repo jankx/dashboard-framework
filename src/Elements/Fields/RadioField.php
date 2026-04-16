@@ -20,7 +20,8 @@ class RadioField extends Field implements RadioFieldInterface
         $this->args = array_merge([
             'options' => [],
             'default' => '',
-            'layout' => 'horizontal', // horizontal, vertical
+            'layout' => 'horizontal', // horizontal, vertical, grid
+            'columns' => 3,
         ], $this->args);
     }
 

@@ -1,4 +1,4 @@
-const React = window.wp.element;
+import React from 'react';
 import { FieldProps } from '../types';
 
 export const FieldDivide: React.FC = () => <hr style={{margin: '20px 0', border: '0', borderTop: '1px solid #eee'}} />;

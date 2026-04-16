@@ -1,20 +1,34 @@
 import Field from './Field';
-import { Box, Text, Button } from '@chakra-ui/react';
+import { Box, Text, Button, Image, Flex, IconButton } from '@chakra-ui/react';
+import { CloseIcon } from '@chakra-ui/icons';
 
 export default class ImageField extends Field {
     openMediaLibrary() {
+        if (!window.wp || !window.wp.media) {
+            console.error('WordPress Media Library is not available.');
+            return;
+        }
+
         if (!this.wp_media_frame) {
             this.wp_media_frame = window.wp.media({
-                title: 'Select Image',
+                title: this.field.title || 'Select Image',
                 button: {
-                    text: 'Use this image'
+                    text: 'Select'
                 },
-                multiple: false
+                multiple: false,
+                library: {
+                    type: this.field.library || 'image'
+                }
             });
 
             this.wp_media_frame.on('select', () => {
                 const attachment = this.wp_media_frame.state().get('selection').first().toJSON();
-                this.onChange(this.id, attachment.url);
+                // Store ID and URL for better WP compatibility
+                this.onChange(this.id, {
+                    id: attachment.id,
+                    url: attachment.url,
+                    thumbnail: attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url
+                });
             });
         }
 
@@ -23,44 +37,50 @@ export default class ImageField extends Field {
 
     render(formData) {
         const value = this.getValue(formData);
+        const imageUrl = typeof value === 'object' ? value.url : value;
 
         return (
-            <Box key={this.id}>
-                <Text fontSize="xl">{this.field.title}</Text>
-                <Box sx={{
-                    mt: 1,
-                    border: '1px dashed #ccc',
-                    p: 2,
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    '&:hover': {
-                        backgroundColor: '#f5f5f5'
-                    }
-                }}
-                onClick={() => this.openMediaLibrary()}>
-                    {value ? (
-                        <Box>
-                            <img
-                                src={value}
+            <Box key={this.id} mb={6}>
+                <Text fontWeight="600" mb={2}>{this.field.title}</Text>
+                {this.field.description && (
+                    <Text fontSize="sm" color="gray.500" mb={3}>{this.field.description}</Text>
+                )}
+                
+                <Flex direction="column" align="start">
+                    {imageUrl ? (
+                        <Box position="relative" borderRadius="md" overflow="hidden" boxShadow="sm" border="1px solid" borderColor="gray.200">
+                            <Image
+                                src={imageUrl}
                                 alt="Selected"
-                                style={{maxWidth: '200px', maxHeight: '200px'}}
+                                maxH="200px"
+                                objectFit="contain"
+                                bg="gray.50"
                             />
-                            <Button
-                                sx={{mt: 1}}
-                                variant="outlined"
-                                color="error"
+                            <IconButton
+                                icon={<CloseIcon />}
+                                size="xs"
+                                position="absolute"
+                                top={1}
+                                right={1}
+                                colorScheme="red"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     this.onChange(this.id, '');
                                 }}
-                            >
-                                Remove Image
-                            </Button>
+                                aria-label="Remove image"
+                            />
                         </Box>
                     ) : (
-                        <Text>Click to select image</Text>
+                        <Button 
+                            variant="outline" 
+                            colorScheme="blue" 
+                            onClick={() => this.openMediaLibrary()}
+                            leftIcon={<span className="dashicons dashicons-format-image" style={{fontSize: '18px', width: '18px', height: '18px'}}></span>}
+                        >
+                            {__('Choose Image', 'jankx')}
+                        </Button>
                     )}
-                </Box>
+                </Flex>
             </Box>
         );
     }

@@ -1,4 +1,4 @@
-const React = window.wp.element; import { useState } from 'react';
+import React, { useState } from 'react';
 import { FieldProps } from '../types';
 import { 
   ArrowUp, ArrowDown, Trash2, Plus, Move, 

@@ -1,4 +1,4 @@
-const React = window.wp.element; import { Component } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Save, Menu } from 'lucide-react';
 import {

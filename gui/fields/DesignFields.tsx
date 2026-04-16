@@ -1,4 +1,4 @@
-const React = window.wp.element; import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { FieldProps } from '../types';
 import { Upload, Italic, Type } from 'lucide-react';
 // Import coloris directly (bundled, no CDN)

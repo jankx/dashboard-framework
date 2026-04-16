@@ -1,4 +1,4 @@
-const React = window.wp.element;
+import React from 'react';
 import { Box, Text, Button, Link } from '@chakra-ui/react';
 import { FaFacebook, FaTwitter, FaGithub, FaLinkedin } from 'react-icons/fa';
 
