@@ -504,16 +504,20 @@ class OptionFramework
                 }
             }
 
-            // Get existing options to compare for the main group
+            // Get existing options to compare for the main group. Parse JSON if it's an old string format.
             $existing_options = get_option($this->instance_name);
-            $new_options_json = json_encode($options_data);
+            if (is_string($existing_options) && !empty($existing_options)) {
+                $existing_options = json_decode($existing_options, true) ?: [];
+            } else if (!is_array($existing_options)) {
+                $existing_options = [];
+            }
 
-            if ($existing_options === $new_options_json) {
+            if ($existing_options === $options_data) {
                 wp_send_json_success('Lưu options thành công'); // Send success if no changes to main blob but might have saved others
                 return;
             }
 
-            $result = update_option($this->instance_name, $new_options_json);
+            $result = update_option($this->instance_name, $options_data);
             if ($result) {
                 wp_send_json_success('Lưu options thành công');
             } else {
