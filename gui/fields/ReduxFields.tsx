@@ -11,6 +11,7 @@ import { FieldEditor, FieldAceEditor } from './EditorFields';
 import { FieldSection, FieldDivide, FieldInfo, FieldRaw } from './LayoutFields';
 import { FieldSeoComposite } from './SpecialFields';
 import { FieldSvgChooser } from './SvgChooserField';
+import { FieldIcon } from './IconField';
 
 // ==========================================
 // MAIN RENDERER
@@ -81,6 +82,9 @@ export const ReduxFieldRenderer: React.FC<FieldProps> = (props) => {
             case 'svg_chooser':
             case 'preset_chooser':
             case 'layout_chooser': return <FieldSvgChooser {...props} />;
+
+            case 'icon':
+            case 'icon_chooser': return <FieldIcon {...props} />;
 
             default: return <div style={{ color: 'red' }}>Field {field.type} not implemented</div>;
           }

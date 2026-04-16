@@ -34,6 +34,7 @@ class OptionFramework
         add_action('admin_enqueue_scripts', [$this, 'enqueueScripts']);
         add_action('wp_ajax_save_options', [$this, 'saveOptions']);
         add_action('wp_ajax_fetch_options', [$this, 'fetchOptions']);
+        add_action('wp_ajax_fetch_icons', [$this, 'fetchIcons']);
     }
 
     public function setPageTitle($page_title)
@@ -429,6 +430,19 @@ class OptionFramework
             // Add WordPress Media Uploader
             wp_enqueue_media();
 
+            // Enqueue active icon fonts from the repository
+            try {
+                $repo = $this->app->make(\Jankx\Services\FontIcons\IconRepository::class);
+                if ($repo) {
+                   $styles = $repo->getAllActiveStyles();
+                   foreach ($styles as $handle => $url) {
+                       wp_enqueue_style('jankx-icon-' . $handle, $url, [], null);
+                   }
+                }
+            } catch (\Exception $e) {
+                // Ignore if icon repository not found or failed
+            }
+
             // Icon Picker - TODO: Implement React-based icon picker component
             // wp_enqueue_style('dashicons');
         }
@@ -570,6 +584,37 @@ class OptionFramework
         }
 
         wp_send_json_success($options_data);
+    }
+    
+    public function fetchIcons()
+    {
+        $type = $_GET['type'] ?? null;
+        $search = $_GET['search'] ?? '';
+        $category = $_GET['category'] ?? null;
+
+        try {
+            $repo = $this->app->make(\Jankx\Services\FontIcons\IconRepository::class);
+            if (!$repo) {
+                wp_send_json_error('Icon Repository not found');
+            }
+
+            $results = [];
+            if ($search) {
+                $results = $repo->searchIcons($search, $type);
+            } elseif ($type) {
+                $results = $repo->getIconsByType($type, ['category' => $category]);
+            } else {
+                // Return types and categories first if no type selected
+                wp_send_json_success([
+                    'types' => $repo->getIconTypes(),
+                    'active_types' => $repo->getActiveTypes()
+                ]);
+            }
+
+            wp_send_json_success($results);
+        } catch (\Exception $e) {
+            wp_send_json_error($e->getMessage());
+        }
     }
 
     // Phương thức để thêm page
