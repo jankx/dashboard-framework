@@ -16,8 +16,8 @@ class OptionFramework
     private $config;
     public $pages = [];
     private static $built_in_options = [];
-    private $menu_slug = null;
     private $auto_register_menu = true; // Flag để bật/tắt việc tự động đăng ký menu
+    protected $app;
 
     public function __construct($instance_name)
     {
@@ -90,6 +90,12 @@ class OptionFramework
             add_action('customize_controls_enqueue_scripts', [$this, 'enqueueCustomizerScripts']);
         }
 
+        return $this;
+    }
+
+    public function setApp($app)
+    {
+        $this->app = $app;
         return $this;
     }
 
@@ -432,12 +438,14 @@ class OptionFramework
 
             // Enqueue active icon fonts from the repository
             try {
-                $repo = $this->app->make(\Jankx\Services\FontIcons\IconRepository::class);
-                if ($repo) {
-                   $styles = $repo->getAllActiveStyles();
-                   foreach ($styles as $handle => $url) {
-                       wp_enqueue_style('jankx-icon-' . $handle, $url, [], null);
-                   }
+                if ($this->app && $this->app->bound(\Jankx\Services\FontIcons\IconRepository::class)) {
+                    $repo = $this->app->make(\Jankx\Services\FontIcons\IconRepository::class);
+                    if ($repo) {
+                       $styles = $repo->getAllActiveStyles();
+                       foreach ($styles as $handle => $url) {
+                           wp_enqueue_style('jankx-icon-' . $handle, $url, [], null);
+                       }
+                    }
                 }
             } catch (\Exception $e) {
                 // Ignore if icon repository not found or failed
