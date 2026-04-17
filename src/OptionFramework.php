@@ -274,7 +274,14 @@ class OptionFramework
      */
     private function transformFieldToArray($field, $for_js = false) {
         if (!($field instanceof \Jankx\Dashboard\Elements\Field)) {
-            return (array) $field;
+            $arrayField = (array) $field;
+            if (!isset($arrayField['title']) && isset($arrayField['name'])) {
+                $arrayField['title'] = $arrayField['name'];
+            }
+            if ($for_js && isset($arrayField['type']) && $arrayField['type'] === 'image') {
+                $arrayField['type'] = 'media';
+            }
+            return $arrayField;
         }
 
         $type = $field->getType();
