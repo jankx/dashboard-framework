@@ -360,10 +360,7 @@ class OptionFramework
         ?>
         <div class="jankx-admin-page-container jankx-theme-options-page">
             <style>
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
                 .jankx-admin-page-container {
-                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                     margin: 20px 20px 20px 0;
                     color: #1e293b;
                 }
@@ -436,14 +433,11 @@ class OptionFramework
         $menu_slug = $this->getMenuSlug();
         $check_slug = $this->menu_slug ? $menu_slug : "{$this->instance_name}-options";
         if (str_contains($screen->id, $check_slug)) {
-            // Enqueue Google Fonts (optional, can be bundled too if needed)
-            wp_enqueue_style('jankx-options-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap', [], null);
-            
-            // Coloris and Air Datepicker CSS are now bundled in styles.css (no CDN needed)
+            // Coloris and Air Datepicker CSS are now bundled in bundle.css (no CDN needed)
             // Tải script và CSS chỉ khi ở trên trang tùy chọn
-            // All dependencies (coloris, air-datepicker) are bundled in bundle.js and styles.css
+            // All dependencies (coloris, air-datepicker) are bundled in bundle.js and bundle.css
             wp_enqueue_script('react-app', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.js?v=1.0.1.41', ['wp-element'], null, true);
-            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/styles.css?v=1.0.0.27');
+            wp_enqueue_style('option-framework-style', get_template_directory_uri() . '/vendor/jankx/dashboard-framework/dist/bundle.css?v=1.0.0.28');
 
             // Add WordPress Media Uploader
             wp_enqueue_media();
