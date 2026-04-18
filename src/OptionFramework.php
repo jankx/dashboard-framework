@@ -305,6 +305,11 @@ class OptionFramework
 
         $fieldArgs = $field->getArgs();
         if (!empty($fieldArgs)) {
+            // Automatically fetch value from WordPress if option_name is provided
+            if (isset($fieldArgs['option_name']) && !empty($fieldArgs['option_name'])) {
+                $fieldArgs['value'] = get_option($fieldArgs['option_name'], $fieldArgs['value'] ?? $fieldArgs['default'] ?? null);
+            }
+
             // Filter some args if for JS
             if ($for_js) {
                 // If writer/getter are closures, they can't be serialized to JS
