@@ -15,8 +15,8 @@ const fetchOptionsEpic = (action$) =>
     action$.pipe(
         ofType('FETCH_OPTIONS_REQUEST'),
         mergeMap(() => {
-            const ajaxUrl = (window.jankxOptionAjax && window.jankxOptionAjax.ajaxurl) 
-                ? window.jankxOptionAjax.ajaxurl 
+            const ajaxUrl = (window.jankxOptionAjax && window.jankxOptionAjax.ajaxurl)
+                ? window.jankxOptionAjax.ajaxurl
                 : '/wp-admin/admin-ajax.php';
             return ajax.getJSON(`${ajaxUrl}?action=fetch_options`).pipe(
                 map(response => fetchOptionsSuccess(response.data || response)),
@@ -29,24 +29,22 @@ const saveOptionsEpic = (action$) =>
     action$.pipe(
         ofType('SAVE_OPTIONS_REQUEST'),
         mergeMap(action => {
-            const ajaxUrl = (window.jankxOptionAjax && window.jankxOptionAjax.ajaxurl) 
-                ? window.jankxOptionAjax.ajaxurl 
+            const ajaxUrl = (window.jankxOptionAjax && window.jankxOptionAjax.ajaxurl)
+                ? window.jankxOptionAjax.ajaxurl
                 : '/wp-admin/admin-ajax.php';
-            const nonce = (window.jankxOptionAjax && window.jankxOptionAjax.nonce) 
-                ? window.jankxOptionAjax.nonce 
+            const nonce = (window.jankxOptionAjax && window.jankxOptionAjax.nonce)
+                ? window.jankxOptionAjax.nonce
                 : '';
-            
+
             // Ensure payload exists
             const payload = action.payload || {};
-            
-            // Build form data for WordPress AJAX
-            const formData = new URLSearchParams();
-            formData.append('action', 'save_options');
-            formData.append('nonce', nonce);
-            formData.append('data', JSON.stringify(payload));
-            
-            return ajax.post(ajaxUrl, formData.toString(), {
-                'Content-Type': 'application/x-www-form-urlencoded',
+
+            // Put action & nonce in URL query params so WordPress AJAX can route correctly.
+            // Send data as JSON body — PHP reads it from php://input.
+            const url = `${ajaxUrl}?action=save_options&nonce=${encodeURIComponent(nonce)}`;
+
+            return ajax.post(url, JSON.stringify(payload), {
+                'Content-Type': 'application/json',
             }).pipe(
                 map(() => saveOptionsSuccess()),
                 catchError(error => of(saveOptionsFailure(error.message || error)))

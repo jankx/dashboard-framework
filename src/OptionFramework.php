@@ -104,7 +104,7 @@ class OptionFramework
      */
     public function enqueueCustomizerScripts()
     {
-        $base_url = get_stylesheet_directory_uri() . '/vendor/jankx/dashboard-framework/gui/assets';
+        $base_url = get_template_directory_uri() . '/vendor/jankx/dashboard-framework/gui/assets';
         $version = '1.1.0'; // Stable Release
         
         wp_enqueue_script(
@@ -464,21 +464,29 @@ class OptionFramework
 
     public function saveOptions()
     {
+        error_log("saveOptions AJAX CALLED");
         if (!Jankx_Security_Helper::verify_nonce('nonce', 'save_options_nonce')) {
             wp_send_json_error('Nonce không hợp lệ');
             return;
         }
 
-        // Try to get data from $_POST first (standard WordPress AJAX)
+        // Try to get data from $_POST first (standard WordPress AJAX form post)
         $options_json = isset($_POST['data']) ? wp_unslash($_POST['data']) : null;
 
-        // If not in $_POST, try to read from php://input (for application/json)
+        // If not in $_POST, try to read from php://input (application/json body)
         if (empty($options_json)) {
             $input_data = file_get_contents('php://input');
             if (!empty($input_data)) {
-                $data = json_decode($input_data, true);
-                if (json_last_error() === JSON_ERROR_NONE && isset($data['data'])) {
-                    $options_json = $data['data'];
+                $decoded = json_decode($input_data, true);
+                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                    // New format: body is the raw payload directly
+                    if (isset($decoded['data'])) {
+                        // Old nested format: {action, nonce, data: {...}}
+                        $options_json = $decoded['data'];
+                    } else {
+                        // New format: body is the options payload itself
+                        $options_json = $decoded;
+                    }
                 }
             }
         }
@@ -502,6 +510,7 @@ class OptionFramework
             
             // Handle independent field saving
             $sync_with_customizer = $this->config['sync_with_customizer'] ?? false;
+            error_log("Jankx Dashboard Save: Sync is " . ($sync_with_customizer ? 'ON' : 'OFF') . " for " . $this->instance_name);
             foreach ($mapped_pages as $page) {
                 foreach ($page['sections'] as $section) {
                     foreach ($section['fields'] as $field) {
@@ -511,6 +520,7 @@ class OptionFramework
                             
                             // Synchronize with WordPress Customizer
                             if ($sync_with_customizer) {
+                                error_log("Jankx Dashboard Save: set_theme_mod('{$field_id}', '" . (is_array($value) ? 'array' : $value) . "')");
                                 set_theme_mod($field_id, $value);
                             }
 
@@ -535,11 +545,19 @@ class OptionFramework
                 $existing_options = [];
             }
 
+            if ($sync_with_customizer) {
+                // If sync with customizer is enabled, we've already saved individual theme_mods.
+                // We skip updating the main option blob to keep theme_mods as the single source of truth.
+                wp_send_json_success('Lưu options vào Theme Mods thành công!');
+                return;
+            }
+
             if ($existing_options === $options_data) {
                 wp_send_json_success('Lưu options thành công'); // Send success if no changes to main blob but might have saved others
                 return;
             }
 
+            error_log("REACHED update_option for " . $this->instance_name);
             $result = update_option($this->instance_name, $options_data);
             if ($result) {
                 do_action('jankx_dashboard_after_save_options', $options_data, $this->instance_name);
@@ -575,8 +593,11 @@ class OptionFramework
 
                     // Fetch from Customizer (theme_mod) if sync is enabled
                     if ($sync_with_customizer) {
-                        $custom_value = get_theme_mod($field_id, $field['default'] ?? null);
-                        $has_custom = true;
+                        $mod_val = get_theme_mod($field_id, '__JANKX_EMPTY__');
+                        if ($mod_val !== '__JANKX_EMPTY__') {
+                            $custom_value = $mod_val;
+                            $has_custom = true;
+                        }
                     }
 
                     // Custom getter?
@@ -755,7 +776,7 @@ class OptionFramework
             'media'       => 'WP_Customize_Media_Control',
             'upload'      => 'WP_Customize_Image_Control',
             'typography'  => \Jankx\Dashboard\Customizer\Controls\TypographyControl::class,
-            'repeater'    => 'textarea', // Fallback for now
+            'repeater'    => null, // Repeater values are arrays and cause crashes in standard controls
             'divide'      => null, // Dividers usually don't have a customizer control
         ];
 
@@ -822,6 +843,12 @@ class OptionFramework
                     }
 
                     $type = $field['type'] ?? 'text';
+
+                    // Skip multi-value checkbox fields as they cause fatal errors in standard Customizer controls
+                    if ($type === 'checkbox' && !empty($field['options'])) {
+                        continue;
+                    }
+
                     $control_class = $this->mapCustomizerControl($type);
 
                     if (empty($control_class)) {
@@ -836,7 +863,7 @@ class OptionFramework
                         'type' => 'theme_mod',
                         'capability' => $this->config['capability'] ?? 'edit_theme_options',
                         'transport' => $field['transport'] ?? 'refresh',
-                        'sanitize_callback' => $field['sanitize_callback'] ?? 'sanitize_text_field',
+                        'sanitize_callback' => is_array($default) ? null : ($field['sanitize_callback'] ?? 'sanitize_text_field'),
                     ]);
 
                     $control_args = [

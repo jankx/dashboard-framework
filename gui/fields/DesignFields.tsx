@@ -1,33 +1,69 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FieldProps } from '../types';
 import { Upload, Italic, Type } from 'lucide-react';
 // Import coloris directly (bundled, no CDN)
 import Coloris from '@melloware/coloris';
 
 export const FieldColor: React.FC<FieldProps> = ({ value, onChange }) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const lastNotifiedValue = useRef(value);
+
+    // Generate a stable unique id for this field instance
+    const fieldId = useRef(`coloris-field-${Math.random().toString(36).slice(2)}`);
+
     useEffect(() => {
-        // Initialize coloris (bundled, no async needed)
+        const el = inputRef.current;
+        if (!el) return;
+
+        // Initialize Coloris globally once
         try {
             if (Coloris && typeof Coloris.init === 'function') {
                 Coloris.init();
-                Coloris({ el: '.coloris', theme: 'polaroid', themeMode: 'light', format: 'hex', formatToggle: true });
             }
+            // Bind Coloris to THIS specific element
+            Coloris({
+                el: `#${fieldId.current}`,
+                theme: 'polaroid',
+                themeMode: 'light',
+                format: 'hex',
+                formatToggle: true,
+                onChange: (color: string) => {
+                    lastNotifiedValue.current = color;
+                    onChange(color);
+                },
+            });
         } catch (e) {
             console.warn('Coloris initialization error:', e);
         }
-    }, []);
+    }, []); // Run once on mount only
+
+    // Sync external value changes (e.g. from fetch response) to Coloris
+    useEffect(() => {
+        if (value !== lastNotifiedValue.current) {
+            lastNotifiedValue.current = value;
+            if (inputRef.current) {
+                // Must dispatch native event because React's value assignment doesn't trigger Coloris
+                inputRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+    }, [value]);
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <input type="text" className="jankx-input coloris" style={{ width: '120px' }} value={value || ''} onChange={(e) => onChange(e.target.value)} data-coloris />
-            <div style={{ width: '36px', height: '36px', borderRadius: '4px', border: '1px solid #ccc', background: value || '#fff' }}></div>
-        </div>
-    );
-
-    return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <input type="text" className="jankx-input coloris" style={{ width: '120px' }} value={value || ''} onChange={(e) => onChange(e.target.value)} data-coloris />
-            <div style={{ width: '36px', height: '36px', borderRadius: '4px', border: '1px solid #ccc', background: value || '#fff' }}></div>
+            <input
+                ref={inputRef}
+                id={fieldId.current}
+                type="text"
+                className="jankx-input coloris"
+                style={{ width: '120px' }}
+                value={value || ''}
+                onChange={(e) => {
+                    const val = e.target.value;
+                    lastNotifiedValue.current = val;
+                    onChange(val);
+                }}
+                data-coloris
+            />
         </div>
     );
 };

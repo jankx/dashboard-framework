@@ -6,6 +6,8 @@ export default class ColorField extends Field {
         const value = this.getValue(formData);
         const defaultValue = this.field.default || '#000000';
 
+        const displayValue = value || defaultValue;
+
         return (
             <Box key={this.id} mb={6}>
                 <Text fontWeight="600" mb={2}>{this.field.title}</Text>
@@ -14,23 +16,23 @@ export default class ColorField extends Field {
                 )}
 
                 <Flex align="center">
-                    <Box 
-                        width="40px" 
-                        height="40px" 
-                        borderRadius="md" 
-                        mr={3} 
-                        border="1px solid" 
+                    <Box
+                        width="40px"
+                        height="40px"
+                        borderRadius="md"
+                        mr={3}
+                        border="1px solid"
                         borderColor="gray.200"
-                        bg={value || defaultValue}
+                        bg={displayValue}
                         sx={{
                             cursor: 'pointer',
                             position: 'relative',
                             overflow: 'hidden'
                         }}
                     >
-                        <Input 
-                            type="color" 
-                            value={value || defaultValue}
+                        <Input
+                            type="color"
+                            value={displayValue}
                             onChange={(e) => this.onChange(this.id, e.target.value)}
                             position="absolute"
                             top="-5px"
@@ -42,9 +44,9 @@ export default class ColorField extends Field {
                             cursor="pointer"
                         />
                     </Box>
-                    <Input 
+                    <Input
                         size="sm"
-                        value={value}
+                        value={displayValue}
                         placeholder={defaultValue}
                         onChange={(e) => this.onChange(this.id, e.target.value)}
                         width="120px"
