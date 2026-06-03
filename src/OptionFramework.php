@@ -13,6 +13,7 @@ class OptionFramework
     private $instance_name;
     private $page_title = 'Tùy Chọn Theme Jankx';
     private $menu_text = 'Tùy Chọn';
+    private $menu_slug;
     private $config;
     public $pages = [];
     private static $built_in_options = [];
