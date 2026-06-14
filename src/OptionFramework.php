@@ -11,8 +11,8 @@ use Jankx\Dashboard\Elements\Page;
 class OptionFramework
 {
     private $instance_name;
-    private $page_title = 'Tùy Chọn Theme Jankx';
-    private $menu_text = 'Tùy Chọn';
+    private $page_title = 'Jankx Theme Options';
+    private $menu_text = 'Options';
     private $menu_slug;
     private $config;
     public $pages = [];
@@ -356,7 +356,7 @@ class OptionFramework
         $framework_version = '1.0.0'; // Default fallback
         $icon = $this->config['menu_icon'] ?? 'dashicons-admin-generic';
         $title = $this->page_title;
-        $subtitle = __('Cấu hình các tùy chọn cho giao diện website của bạn.', 'jankx');
+        $subtitle = __('Configure the options for your website interface.', 'jankx');
 
         ?>
         <div class="jankx-admin-page-container jankx-theme-options-page">
@@ -467,7 +467,7 @@ class OptionFramework
     {
         error_log("saveOptions AJAX CALLED");
         if (!Jankx_Security_Helper::verify_nonce('nonce', 'save_options_nonce')) {
-            wp_send_json_error('Nonce không hợp lệ');
+            wp_send_json_error(__('Invalid nonce', 'jankx'));
             return;
         }
 
@@ -493,13 +493,13 @@ class OptionFramework
         }
 
         if (empty($options_json)) {
-            wp_send_json_error('Không có dữ liệu được gửi');
+            wp_send_json_error(__('No data sent', 'jankx'));
             return;
         }
 
         $options_data = is_array($options_json) ? $options_json : json_decode($options_json, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            wp_send_json_error('Dữ liệu options không hợp lệ');
+            wp_send_json_error(__('Invalid options data', 'jankx'));
             return;
         }
 
@@ -549,7 +549,7 @@ class OptionFramework
             if ($sync_with_customizer) {
                 // If sync with customizer is enabled, we've already saved individual theme_mods.
                 // We skip updating the main option blob to keep theme_mods as the single source of truth.
-                wp_send_json_success('Lưu options vào Theme Mods thành công!');
+                wp_send_json_success(__('Options saved successfully to Theme Mods!', 'jankx'));
                 return;
             }
 
@@ -562,12 +562,12 @@ class OptionFramework
             $result = update_option($this->instance_name, $options_data);
             if ($result) {
                 do_action('jankx_dashboard_after_save_options', $options_data, $this->instance_name);
-                wp_send_json_success('Lưu options thành công');
+                wp_send_json_success(__('Options saved successfully', 'jankx'));
             } else {
-                wp_send_json_error('Không thể lưu options');
+                wp_send_json_error(__('Could not save options', 'jankx'));
             }
         } else {
-            wp_send_json_error('Dữ liệu không hợp lệ');
+            wp_send_json_error(__('Invalid data', 'jankx'));
         }
     }
 
