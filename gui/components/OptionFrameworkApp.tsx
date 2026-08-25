@@ -169,7 +169,7 @@ class OptionFrameworkApp extends Component<OptionFrameworkAppProps, OptionFramew
                                             onClick={() => this.handlePageChange(pageId)}
                                             className={`jankx-menu-item ${isActive ? 'active' : ''}`}
                                         >
-                                            <span>{page.icon || ''}</span>
+                                            {page.icon && page.icon.includes('dashicons') ? <span className={page.icon}></span> : <span>{page.icon || ''}</span>}
                                             <span>{page.title || pageId}</span>
                                         </button>
                                     );
@@ -190,7 +190,7 @@ class OptionFrameworkApp extends Component<OptionFrameworkAppProps, OptionFramew
                             
                             {/* Section Header */}
                             <div className="jankx-panel-header">
-                                {activePageData.icon && <span>{activePageData.icon}</span>}
+                                {activePageData.icon && (activePageData.icon.includes('dashicons') ? <span className={activePageData.icon}></span> : <span>{activePageData.icon}</span>)}
                                 <h2>{activePageData.title || activePage}</h2>
                             </div>
 
